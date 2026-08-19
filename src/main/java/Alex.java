@@ -53,10 +53,52 @@ public class Alex {
                 System.out.println("OK, I've marked this task as not done yet:");
                 System.out.println("   " + task);
                 System.out.println(divider);
+            } else if (command.startsWith("todo ")) {
+                Task task = new Todo(command.substring("todo ".length()));
+                tasks[taskCount] = task;
+                taskCount++;
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + task);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(divider);
+            } else if (command.startsWith("deadline ")) {
+                String details = command.substring("deadline ".length());
+                int bySeparator = details.indexOf(" /by ");
+
+                String description = details.substring(0, bySeparator);
+                String by = details.substring(bySeparator + " /by ".length());
+
+                Task task = new Deadline(description, by);
+                tasks[taskCount] = task;
+                taskCount++;
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + task);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(divider);
+            } else if (command.startsWith("event ")) {
+                String details = command.substring("event ".length());
+                int fromSeparator = details.indexOf(" /from ");
+                int toSeparator = details.indexOf(" /to ", fromSeparator + " /from ".length());
+
+                String description = details.substring(0, fromSeparator);
+                String from = details.substring(fromSeparator + " /from ".length(), toSeparator);
+                String to = details.substring(toSeparator + " /to ".length());
+
+                Task task = new Event(description, from, to);
+                tasks[taskCount] = task;
+                taskCount++;
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + task);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(divider);
             } else {
                 Task task = new Task(command);
                 tasks[taskCount] = task;
                 taskCount++;
+
                 System.out.println("added: " + task);
                 System.out.println(divider);
             }
