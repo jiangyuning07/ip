@@ -28,7 +28,7 @@ public class Alex {
                 break;
             }
 
-            System.out.println(" " + command);
+            System.out.println("> " + command);
             System.out.println(divider);
         }
     }
