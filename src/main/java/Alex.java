@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Alex {
     public static void main(String[] args) {
         String divider = "____________________________________________________________";
@@ -14,7 +16,20 @@ public class Alex {
         System.out.print(banner);
         System.out.println(greeting);
         System.out.println(divider);
-        System.out.println(farewell);
-        System.out.println(divider);
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String command = scanner.nextLine();
+            System.out.println(divider);
+
+            if (command.equals("bye")) {
+                System.out.println(farewell);
+                System.out.println(divider);
+                break;
+            }
+
+            System.out.println(" " + command);
+            System.out.println(divider);
+        }
     }
 }
