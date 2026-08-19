@@ -18,6 +18,9 @@ public class Alex {
         System.out.println(divider);
 
         Scanner scanner = new Scanner(System.in);
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
             System.out.println(divider);
@@ -26,10 +29,17 @@ public class Alex {
                 System.out.println(farewell);
                 System.out.println(divider);
                 break;
+            } else if (command.equals("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+                System.out.println(divider);
+            } else {
+                tasks[taskCount] = command;
+                taskCount++;
+                System.out.println("> added: " + command);
+                System.out.println(divider);
             }
-
-            System.out.println("> " + command);
-            System.out.println(divider);
         }
     }
 }
