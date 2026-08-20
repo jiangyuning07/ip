@@ -2,7 +2,8 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Alex {
-    private static int parseTaskIndex(String command, String commandName, int taskCount) throws AlexException {
+    private static int parseTaskIndex(String command, CommandType commandType, int taskCount) throws AlexException {
+        String commandName = commandType.getKeyword();
         String taskNumberText = command.substring(commandName.length()).trim();
 
         if (taskNumberText.isEmpty()) {
@@ -47,45 +48,46 @@ public class Alex {
 
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
+            CommandType commandType = CommandType.from(command);
             System.out.println(divider);
 
             try {
-                if (command.equals("bye")) {
+                if (commandType == CommandType.BYE) {
                     System.out.println(farewell);
                     System.out.println(divider);
                     break;
-                } else if (command.equals("list")) {
+                } else if (commandType == CommandType.LIST) {
                     System.out.println("Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println(" " + (i + 1) + "." + tasks.get(i));
                     }
                     System.out.println(divider);
-                } else if (command.equals("mark") || command.startsWith("mark ")) {
-                    int taskIndex = parseTaskIndex(command, "mark", tasks.size());
+                } else if (commandType == CommandType.MARK) {
+                    int taskIndex = parseTaskIndex(command, CommandType.MARK, tasks.size());
                     Task task = tasks.get(taskIndex);
                     task.markAsDone();
 
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("   " + task);
                     System.out.println(divider);
-                } else if (command.equals("unmark") || command.startsWith("unmark ")) {
-                    int taskIndex = parseTaskIndex(command, "unmark", tasks.size());
+                } else if (commandType == CommandType.UNMARK) {
+                    int taskIndex = parseTaskIndex(command, CommandType.UNMARK, tasks.size());
                     Task task = tasks.get(taskIndex);
                     task.markAsUndone();
 
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("   " + task);
                     System.out.println(divider);
-                } else if (command.equals("delete") || command.startsWith("delete ")) {
-                    int taskIndex = parseTaskIndex(command, "delete", tasks.size());
+                } else if (commandType == CommandType.DELETE) {
+                    int taskIndex = parseTaskIndex(command, CommandType.DELETE, tasks.size());
                     Task removedTask = tasks.remove(taskIndex);
 
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
                     System.out.println("Now you have " + tasks.size() + " task(s) in the list.");
                     System.out.println(divider);
-                } else if (command.equals("todo") || command.startsWith("todo ")) {
-                    String description = command.substring("todo".length()).trim();
+                } else if (commandType == CommandType.TODO) {
+                    String description = command.substring(CommandType.TODO.getKeyword().length()).trim();
 
                     if (description.isEmpty()) {
                         throw new AlexException("A todo needs a description.");
@@ -98,8 +100,8 @@ public class Alex {
                     System.out.println("   " + task);
                     System.out.println("Now you have " + tasks.size() + " task(s) in the list.");
                     System.out.println(divider);
-                } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-                    String details = command.substring("deadline".length()).trim();
+                } else if (commandType == CommandType.DEADLINE) {
+                    String details = command.substring(CommandType.DEADLINE.getKeyword().length()).trim();
                     int bySeparator = details.indexOf("/by");
 
                     if (bySeparator < 0) {
@@ -124,8 +126,8 @@ public class Alex {
                     System.out.println("   " + task);
                     System.out.println("Now you have " + tasks.size() + " task(s) in the list.");
                     System.out.println(divider);
-                } else if (command.equals("event") || command.startsWith("event ")) {
-                    String details = command.substring("event".length()).trim();
+                } else if (commandType == CommandType.EVENT) {
+                    String details = command.substring(CommandType.EVENT.getKeyword().length()).trim();
                     int fromSeparator = details.indexOf("/from");
 
                     if (fromSeparator < 0) {
