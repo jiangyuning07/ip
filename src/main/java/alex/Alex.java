@@ -1,4 +1,15 @@
+package alex;
+
 import java.nio.file.Path;
+
+import alex.exception.AlexException;
+import alex.parser.CommandType;
+import alex.parser.Parser;
+import alex.storage.Storage;
+import alex.storage.StorageException;
+import alex.task.Task;
+import alex.task.TaskList;
+import alex.ui.Ui;
 
 public class Alex {
     private final Storage storage;
