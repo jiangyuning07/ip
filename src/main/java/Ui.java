@@ -1,0 +1,89 @@
+import java.util.Scanner;
+
+/**
+ * Handles console input and output for Alex.
+ */
+public class Ui {
+    private static final String DIVIDER =
+            "____________________________________________________________";
+    private static final String BANNER = "    _    _           \n"
+            + "   / \\  | | _____  __\n"
+            + "  / _ \\ | |/ _ \\ \\/ /\n"
+            + " / ___ \\| |  __/>  < \n"
+            + "/_/   \\_\\_|\\___/_/\\_\\\n";
+
+    private final Scanner scanner;
+
+    public Ui() {
+        scanner = new Scanner(System.in);
+    }
+
+    public void showWelcome() {
+        System.out.println(DIVIDER);
+        System.out.print(BANNER);
+        System.out.println("Hello! I'm Alex.");
+        System.out.println("What can I do for you?");
+        System.out.println(DIVIDER);
+    }
+
+    public boolean hasNextCommand() {
+        return scanner.hasNextLine();
+    }
+
+    public String readCommand() {
+        return scanner.nextLine().trim();
+    }
+
+    public void showFarewell() {
+        showMessage("Bye. Hope to see you again soon!");
+    }
+
+    public void showTaskList(TaskList tasks) {
+        System.out.println("Here are the tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+        }
+        System.out.println(DIVIDER);
+    }
+
+    public void showTaskAdded(Task task, int taskCount) {
+        System.out.println("Got it. I've added this task:");
+        System.out.println("   " + task);
+        System.out.println("Now you have " + taskCount + " task(s) in the list.");
+        System.out.println(DIVIDER);
+    }
+
+    public void showTaskDeleted(Task task, int taskCount) {
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("   " + task);
+        System.out.println("Now you have " + taskCount + " task(s) in the list.");
+        System.out.println(DIVIDER);
+    }
+
+    public void showTaskMarked(Task task) {
+        System.out.println("Nice! I've marked this task as done:");
+        System.out.println("   " + task);
+        System.out.println(DIVIDER);
+    }
+
+    public void showTaskUnmarked(Task task) {
+        System.out.println("OK, I've marked this task as not done yet:");
+        System.out.println("   " + task);
+        System.out.println(DIVIDER);
+    }
+
+    public void showError(String message) {
+        showMessage("Sorry! " + message);
+    }
+
+    public void showLoadingError(String message) {
+        System.out.println("Sorry! " + message);
+        System.out.println("Please repair or remove the data file, then restart Alex.");
+        System.out.println(DIVIDER);
+    }
+
+    private void showMessage(String message) {
+        System.out.println(message);
+        System.out.println(DIVIDER);
+    }
+}
