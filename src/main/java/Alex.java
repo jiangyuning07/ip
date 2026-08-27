@@ -1,6 +1,7 @@
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 public class Alex {
     private static final Storage STORAGE = new Storage(Path.of("data", "alex.txt"));
@@ -120,20 +121,21 @@ public class Alex {
                     int bySeparator = details.indexOf("/by");
 
                     if (bySeparator < 0) {
-                        throw new AlexException("A deadline needs a description and a /by time.");
+                        throw new AlexException("A deadline needs a description and a /by date.");
                     }
 
                     String description = details.substring(0, bySeparator).trim();
-                    String by = details.substring(bySeparator + "/by".length()).trim();
+                    String byText = details.substring(bySeparator + "/by".length()).trim();
 
                     if (description.isEmpty()) {
                         throw new AlexException("The deadline description cannot be empty.");
                     }
 
-                    if (by.isEmpty()) {
-                        throw new AlexException("The deadline time cannot be empty.");
+                    if (byText.isEmpty()) {
+                        throw new AlexException("The deadline date cannot be empty.");
                     }
 
+                    LocalDate by = DateParser.parse(byText);
                     Task task = new Deadline(description, by);
                     tasks.add(task);
                     STORAGE.saveTasks(tasks);
@@ -147,31 +149,34 @@ public class Alex {
                     int fromSeparator = details.indexOf("/from");
 
                     if (fromSeparator < 0) {
-                        throw new AlexException("An event needs a description, a /from time, and a /to time.");
+                        throw new AlexException("An event needs a description, a /from date, and a /to date.");
                     }
 
                     int toSeparator = details.indexOf("/to", fromSeparator + "/from".length());
 
                     if (toSeparator < 0) {
-                        throw new AlexException("Please specify the event's end time using /to.");
+                        throw new AlexException("Please specify the event's end date using /to.");
                     }
 
                     String description = details.substring(0, fromSeparator).trim();
-                    String from = details.substring(fromSeparator + "/from".length(), toSeparator).trim();
-                    String to = details.substring(toSeparator + "/to".length()).trim();
+                    String fromText = details
+                            .substring(fromSeparator + "/from".length(), toSeparator).trim();
+                    String toText = details.substring(toSeparator + "/to".length()).trim();
 
                     if (description.isEmpty()) {
                         throw new AlexException("The event description cannot be empty.");
                     }
 
-                    if (from.isEmpty()) {
-                        throw new AlexException("The event start time cannot be empty.");
+                    if (fromText.isEmpty()) {
+                        throw new AlexException("The event start date cannot be empty.");
                     }
 
-                    if (to.isEmpty()) {
-                        throw new AlexException("The event end time cannot be empty.");
+                    if (toText.isEmpty()) {
+                        throw new AlexException("The event end date cannot be empty.");
                     }
 
+                    LocalDate from = DateParser.parse(fromText);
+                    LocalDate to = DateParser.parse(toText);
                     Task task = new Event(description, from, to);
                     tasks.add(task);
                     STORAGE.saveTasks(tasks);

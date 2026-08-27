@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,10 +82,10 @@ public class Storage {
                 return new Todo(fields[2]);
             case "D":
                 validateFields(fields, 4);
-                return new Deadline(fields[2], fields[3]);
+                return new Deadline(fields[2], LocalDate.parse(fields[3]));
             case "E":
                 validateFields(fields, 5);
-                return new Event(fields[2], fields[3], fields[4]);
+                return new Event(fields[2], LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
             default:
                 throw new IllegalArgumentException("unknown task type '" + taskType + "'");
             }
