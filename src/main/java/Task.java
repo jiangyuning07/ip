@@ -19,6 +19,23 @@ public class Task {
         isDone = false;
     }
 
+    /**
+     * Returns this task in the format used by the data file.
+     *
+     * @return the serialized task
+     */
+    public String toDataString() {
+        return "T | " + getDoneFlag() + " | " + description;
+    }
+
+    protected int getDoneFlag() {
+        return isDone ? 1 : 0;
+    }
+
+    protected String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

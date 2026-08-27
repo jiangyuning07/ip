@@ -1,7 +1,10 @@
-import java.util.Scanner;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Alex {
+    private static final Storage STORAGE = new Storage(Path.of("data", "alex.txt"));
+
     private static int parseTaskIndex(String command, CommandType commandType, int taskCount) throws AlexException {
         String commandName = commandType.getKeyword();
         String taskNumberText = command.substring(commandName.length()).trim();
@@ -44,7 +47,15 @@ public class Alex {
         System.out.println(divider);
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks;
+        try {
+            tasks = STORAGE.loadTasks();
+        } catch (StorageException e) {
+            System.out.println("Sorry! " + e.getMessage());
+            System.out.println("Please repair or remove the data file, then restart Alex.");
+            System.out.println(divider);
+            return;
+        }
 
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
@@ -66,6 +77,7 @@ public class Alex {
                     int taskIndex = parseTaskIndex(command, CommandType.MARK, tasks.size());
                     Task task = tasks.get(taskIndex);
                     task.markAsDone();
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println("   " + task);
@@ -74,6 +86,7 @@ public class Alex {
                     int taskIndex = parseTaskIndex(command, CommandType.UNMARK, tasks.size());
                     Task task = tasks.get(taskIndex);
                     task.markAsUndone();
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println("   " + task);
@@ -81,6 +94,7 @@ public class Alex {
                 } else if (commandType == CommandType.DELETE) {
                     int taskIndex = parseTaskIndex(command, CommandType.DELETE, tasks.size());
                     Task removedTask = tasks.remove(taskIndex);
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
@@ -95,6 +109,7 @@ public class Alex {
 
                     Task task = new Todo(description);
                     tasks.add(task);
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("Got it. I've added this task:");
                     System.out.println("   " + task);
@@ -105,7 +120,7 @@ public class Alex {
                     int bySeparator = details.indexOf("/by");
 
                     if (bySeparator < 0) {
-                        throw new AlexException("A deadline needs a description and a /by time");
+                        throw new AlexException("A deadline needs a description and a /by time.");
                     }
 
                     String description = details.substring(0, bySeparator).trim();
@@ -121,6 +136,7 @@ public class Alex {
 
                     Task task = new Deadline(description, by);
                     tasks.add(task);
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("Got it. I've added this task:");
                     System.out.println("   " + task);
@@ -131,7 +147,7 @@ public class Alex {
                     int fromSeparator = details.indexOf("/from");
 
                     if (fromSeparator < 0) {
-                        throw new AlexException("An event needs a description, a /from time, and a /to time");
+                        throw new AlexException("An event needs a description, a /from time, and a /to time.");
                     }
 
                     int toSeparator = details.indexOf("/to", fromSeparator + "/from".length());
@@ -158,6 +174,7 @@ public class Alex {
 
                     Task task = new Event(description, from, to);
                     tasks.add(task);
+                    STORAGE.saveTasks(tasks);
 
                     System.out.println("Got it. I've added this task:");
                     System.out.println("   " + task);
@@ -169,6 +186,10 @@ public class Alex {
             } catch (AlexException e) {
                 System.out.println("Sorry! " + e.getMessage());
                 System.out.println(divider);
+            } catch (StorageException e) {
+                System.out.println("Sorry! " + e.getMessage());
+                System.out.println(divider);
+                break;
             }
         }
     }
