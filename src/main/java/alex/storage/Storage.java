@@ -1,3 +1,5 @@
+package alex.storage;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -5,6 +7,11 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import alex.task.Deadline;
+import alex.task.Event;
+import alex.task.Task;
+import alex.task.Todo;
 
 /**
  * Loads and saves Alex's task list using a local data file.

@@ -1,4 +1,9 @@
+package alex.ui;
+
 import java.util.Scanner;
+
+import alex.task.Task;
+import alex.task.TaskList;
 
 /**
  * Handles console input and output for Alex.

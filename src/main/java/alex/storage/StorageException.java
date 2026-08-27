@@ -1,3 +1,5 @@
+package alex.storage;
+
 /**
  * Signals that task data could not be loaded from or saved to disk.
  */

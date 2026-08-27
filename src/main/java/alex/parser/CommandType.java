@@ -1,3 +1,5 @@
+package alex.parser;
+
 /**
  * Represents a command supported by Alex.
  */
