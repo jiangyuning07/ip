@@ -54,6 +54,21 @@ public class Parser {
     }
 
     /**
+     * Extracts and validates the keyword in a find command.
+     *
+     * @param command full user command
+     * @return keyword to search for
+     * @throws AlexException if the keyword is missing
+     */
+    public static String parseFindKeyword(String command) throws AlexException {
+        String keyword = getArguments(command, CommandType.FIND);
+        if (keyword.isEmpty()) {
+            throw new AlexException("Please provide a keyword after 'find'.");
+        }
+        return keyword;
+    }
+
+    /**
      * Creates a task from a todo, deadline, or event command.
      *
      * @param command full user command

@@ -90,6 +90,9 @@ public class Alex {
             case DELETE:
                 deleteTask(command);
                 break;
+            case FIND:
+                findTasks(command);
+                break;
             case TODO, DEADLINE, EVENT:
                 addTask(command, commandType);
                 break;
@@ -120,6 +123,11 @@ public class Alex {
         Task removedTask = tasks.delete(index);
         saveTasks();
         ui.showTaskDeleted(removedTask, tasks.size());
+    }
+
+    private void findTasks(String command) throws AlexException {
+        String keyword = Parser.parseFindKeyword(command);
+        ui.showMatchingTasks(tasks.find(keyword));
     }
 
     private void addTask(String command, CommandType commandType)

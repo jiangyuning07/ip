@@ -33,6 +33,18 @@ public class TaskList {
         return tasks.remove(index);
     }
 
+    /**
+     * Returns tasks whose descriptions contain the specified keyword.
+     *
+     * @param keyword keyword to search for
+     * @return matching tasks in their original order
+     */
+    public List<Task> find(String keyword) {
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .toList();
+    }
+
     public List<Task> getTasks() {
         return List.copyOf(tasks);
     }

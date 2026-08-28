@@ -9,6 +9,11 @@ import alex.exception.AlexException;
 
 public class ParserTest {
     @Test
+    public void parseCommandType_findCommand_returnsFind() {
+        assertEquals(CommandType.FIND, Parser.parseCommandType("find book"));
+    }
+
+    @Test
     public void parseTaskIndex_firstTask_returnsZero() throws AlexException {
         assertEquals(0, Parser.parseTaskIndex("delete 1", CommandType.DELETE, 3));
     }
@@ -61,5 +66,18 @@ public class ParserTest {
                 () -> Parser.parseTaskIndex("delete 1", CommandType.DELETE, 0));
 
         assertEquals("There are no tasks in the list yet.", exception.getMessage());
+    }
+
+    @Test
+    public void parseFindKeyword_validKeyword_returnsKeyword() throws AlexException {
+        assertEquals("book", Parser.parseFindKeyword("find    book   "));
+    }
+
+    @Test
+    public void parseFindKeyword_missingKeyword_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class,
+                () -> Parser.parseFindKeyword("find"));
+
+        assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
     }
 }
