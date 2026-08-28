@@ -1,5 +1,8 @@
 package alex.task;
 
+/**
+ * Represents a task with a description and completion status.
+ */
 public class Task {
     private final String description;
     private boolean isDone;
@@ -13,10 +16,16 @@ public class Task {
         return (isDone ? "X" : " "); // mark done task with X
     }
 
+    /**
+     * Marks this task as complete.
+     */
     public void markAsDone() {
         isDone = true;
     }
 
+    /**
+     * Marks this task as incomplete.
+     */
     public void markAsUndone() {
         isDone = false;
     }
@@ -24,7 +33,7 @@ public class Task {
     /**
      * Returns this task in the format used by the data file.
      *
-     * @return the serialized task
+     * @return the serialized task.
      */
     public String toDataString() {
         return "T | " + getDoneFlag() + " | " + description;

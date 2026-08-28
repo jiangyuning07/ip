@@ -17,9 +17,9 @@ public class DateParser {
     /**
      * Parses a date in the ISO yyyy-MM-dd format.
      *
-     * @param input date text entered by the user
-     * @return the parsed date
-     * @throws AlexException if the input is not a valid ISO date
+     * @param input date text entered by the user.
+     * @return the parsed date.
+     * @throws AlexException if the input is not a valid ISO date.
      */
     public static LocalDate parse(String input) throws AlexException {
         try {
@@ -33,8 +33,8 @@ public class DateParser {
     /**
      * Formats a date in the form Jan 1 2026.
      *
-     * @param date date to format
-     * @return the formatted date
+     * @param date date to format.
+     * @return the formatted date.
      */
     public static String format(LocalDate date) {
         return date.format(DISPLAY_FORMAT);

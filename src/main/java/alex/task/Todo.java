@@ -1,5 +1,8 @@
 package alex.task;
 
+/**
+ * Represents a task without a date.
+ */
 public class Todo extends Task {
     public Todo(String description) {
         super(description);

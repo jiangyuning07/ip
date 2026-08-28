@@ -15,18 +15,24 @@ public enum CommandType {
     UNKNOWN("", false);
 
     private final String keyword;
-    private final boolean accArgs;
+    private final boolean canAcceptArguments;
 
-    CommandType(String keyword, boolean accArgs) {
+    CommandType(String keyword, boolean canAcceptArguments) {
         this.keyword = keyword;
-        this.accArgs = accArgs;
+        this.canAcceptArguments = canAcceptArguments;
     }
 
     public String getKeyword() {
         return keyword;
     }
 
-    public static CommandType from(String command) {
+    /**
+     * Identifies the type of a user command.
+     *
+     * @param command full user command.
+     * @return matching command type, or {@link #UNKNOWN}.
+     */
+    public static CommandType parse(String command) {
         for (CommandType type : values()) {
             if (type == UNKNOWN) {
                 continue;
@@ -36,7 +42,7 @@ public enum CommandType {
                 return type;
             }
 
-            if (type.accArgs && command.startsWith(type.keyword + " ")) {
+            if (type.canAcceptArguments && command.startsWith(type.keyword + " ")) {
                 return type;
             }
         }
