@@ -8,9 +8,17 @@ import org.junit.jupiter.api.Test;
 import alex.exception.AlexException;
 
 /**
- * Tests task index parsing behavior.
+ * Tests command parsing behavior.
  */
 public class ParserTest {
+    /**
+     * Verifies that a find command maps to the find command type.
+     */
+    @Test
+    public void parseCommandType_findCommand_returnsFind() {
+        assertEquals(CommandType.FIND, Parser.parseCommandType("find book"));
+    }
+
     /**
      * Verifies that the first task number maps to index zero.
      *
@@ -94,5 +102,26 @@ public class ParserTest {
                 () -> Parser.parseTaskIndex("delete 1", CommandType.DELETE, 0));
 
         assertEquals("There are no tasks in the list yet.", exception.getMessage());
+    }
+
+    /**
+     * Verifies that a valid find keyword is extracted.
+     *
+     * @throws AlexException if the valid command cannot be parsed.
+     */
+    @Test
+    public void parseFindKeyword_validKeyword_returnsKeyword() throws AlexException {
+        assertEquals("book", Parser.parseFindKeyword("find    book   "));
+    }
+
+    /**
+     * Verifies that a missing find keyword is rejected.
+     */
+    @Test
+    public void parseFindKeyword_missingKeyword_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class,
+                () -> Parser.parseFindKeyword("find"));
+
+        assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
     }
 }

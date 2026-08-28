@@ -1,5 +1,6 @@
 package alex.ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 import alex.task.Task;
@@ -71,6 +72,19 @@ public class Ui {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.getSize(); i++) {
             System.out.println(" " + (i + 1) + "." + tasks.get(i));
+        }
+        System.out.println(DIVIDER);
+    }
+
+    /**
+     * Displays tasks that match a search keyword.
+     *
+     * @param matchingTasks tasks to display.
+     */
+    public void showMatchingTasks(List<Task> matchingTasks) {
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
         }
         System.out.println(DIVIDER);
     }
