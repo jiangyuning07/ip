@@ -40,5 +40,9 @@ does not cover.
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.
-When proposing or creating a commit message, include enough detail to explain the rationale for the change.
+For every task that proposes, reviews, creates, amends, squashes, or merges a
+commit, use the repository skill `$seedu-git-standard` at
+`.agents/skills/seedu-git-standard/SKILL.md`. All commit messages, including merge
+commit messages, must follow the SE-EDU Git conventions enforced by that skill.
+Use the same skill when naming branches.
 Do not commit or push unless explicitly asked.
