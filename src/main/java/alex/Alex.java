@@ -11,6 +11,9 @@ import alex.task.Task;
 import alex.task.TaskList;
 import alex.ui.Ui;
 
+/**
+ * Runs the Alex task manager.
+ */
 public class Alex {
     private final Storage storage;
     private final Ui ui;
@@ -20,7 +23,7 @@ public class Alex {
     /**
      * Creates Alex and loads its saved tasks.
      *
-     * @param filePath path of the task data file
+     * @param filePath path of the task data file.
      */
     public Alex(String filePath) {
         ui = new Ui();
@@ -68,9 +71,9 @@ public class Alex {
     /**
      * Executes one parsed command.
      *
-     * @param command full user command
-     * @param commandType parsed type of the command
-     * @return false when Alex should stop accepting commands
+     * @param command full user command.
+     * @param commandType parsed type of the command.
+     * @return false when Alex should stop accepting commands.
      */
     private boolean executeCommand(String command, CommandType commandType)
             throws AlexException, StorageException {
@@ -134,6 +137,11 @@ public class Alex {
         storage.saveTasks(tasks.getTasks());
     }
 
+    /**
+     * Starts Alex using the default task data file.
+     *
+     * @param args command-line arguments, which are ignored.
+     */
     public static void main(String[] args) {
         new Alex("data/alex.txt").run();
     }

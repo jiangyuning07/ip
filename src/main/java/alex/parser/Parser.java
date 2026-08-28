@@ -14,6 +14,12 @@ import alex.util.DateParser;
  */
 public class Parser {
 
+    /**
+     * Identifies the type of a user command.
+     *
+     * @param command full user command.
+     * @return the matching command type.
+     */
     public static CommandType parseCommandType(String command) {
         return CommandType.from(command);
     }
@@ -21,11 +27,11 @@ public class Parser {
     /**
      * Extracts and validates the one-based task number in a command.
      *
-     * @param command full user command
-     * @param commandType command whose argument is being parsed
-     * @param taskCount number of tasks currently available
-     * @return corresponding zero-based task index
-     * @throws AlexException if the argument is missing, invalid, or out of range
+     * @param command full user command.
+     * @param commandType command whose argument is being parsed.
+     * @param taskCount number of tasks currently available.
+     * @return corresponding zero-based task index.
+     * @throws AlexException if the argument is missing, invalid, or out of range.
      */
     public static int parseTaskIndex(String command, CommandType commandType, int taskCount)
             throws AlexException {
@@ -56,10 +62,10 @@ public class Parser {
     /**
      * Creates a task from a todo, deadline, or event command.
      *
-     * @param command full user command
-     * @param commandType type of task to create
-     * @return task represented by the command
-     * @throws AlexException if required task details are missing or invalid
+     * @param command full user command.
+     * @param commandType type of task to create.
+     * @return task represented by the command.
+     * @throws AlexException if required task details are missing or invalid.
      */
     public static Task parseTask(String command, CommandType commandType) throws AlexException {
         return switch (commandType) {
