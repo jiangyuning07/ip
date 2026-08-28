@@ -1,12 +1,13 @@
 package alex.util;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import alex.exception.AlexException;
 import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+
+import alex.exception.AlexException;
 
 /**
  * Tests parsing of ISO-formatted dates.
@@ -50,7 +51,7 @@ public class DateParserTest {
                 () -> DateParser.parse("28-08-2026"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
-                        + "for example 2019-12-02.",
+                + "for example 2019-12-02.",
                 exception.getMessage());
     }
 
@@ -63,7 +64,7 @@ public class DateParserTest {
                 () -> DateParser.parse("2026-02-30"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
-                        + "for example 2019-12-02.",
+                + "for example 2019-12-02.",
                 exception.getMessage());
     }
 
@@ -76,7 +77,7 @@ public class DateParserTest {
                 () -> DateParser.parse("2025-02-29"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
-                        + "for example 2019-12-02.",
+                + "for example 2019-12-02.",
                 exception.getMessage());
     }
 
@@ -89,7 +90,7 @@ public class DateParserTest {
                 () -> DateParser.parse(""));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
-                        + "for example 2019-12-02.",
+                + "for example 2019-12-02.",
                 exception.getMessage());
     }
 }

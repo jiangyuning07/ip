@@ -30,7 +30,7 @@ public class TaskList {
      *
      * @return the task count.
      */
-    public int size() {
+    public int getSize() {
         return tasks.size();
     }
 

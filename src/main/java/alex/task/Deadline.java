@@ -8,17 +8,17 @@ import alex.util.DateParser;
  * Represents a task that must be completed by a specific date.
  */
 public class Deadline extends Task {
-    private final LocalDate by;
+    private final LocalDate dueDate;
 
     /**
      * Creates a deadline with a description and due date.
      *
      * @param description description of the task.
-     * @param by date by which the task should be completed.
+     * @param dueDate date by which the task should be completed.
      */
-    public Deadline(String description, LocalDate by) {
+    public Deadline(String description, LocalDate dueDate) {
         super(description);
-        this.by = by;
+        this.dueDate = dueDate;
     }
 
     /**
@@ -26,7 +26,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toDataString() {
-        return "D | " + getDoneFlag() + " | " + getDescription() + " | " + by;
+        return "D | " + getDoneFlag() + " | " + getDescription() + " | " + dueDate;
     }
 
     /**
@@ -34,6 +34,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + DateParser.format(by) + ")";
+        return "[D]" + super.toString() + " (by: " + DateParser.format(dueDate) + ")";
     }
 }

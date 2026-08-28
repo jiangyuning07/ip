@@ -103,7 +103,7 @@ public class Alex {
     }
 
     private void markTask(String command) throws AlexException, StorageException {
-        int index = Parser.parseTaskIndex(command, CommandType.MARK, tasks.size());
+        int index = Parser.parseTaskIndex(command, CommandType.MARK, tasks.getSize());
         Task task = tasks.get(index);
         task.markAsDone();
         saveTasks();
@@ -111,7 +111,7 @@ public class Alex {
     }
 
     private void unmarkTask(String command) throws AlexException, StorageException {
-        int index = Parser.parseTaskIndex(command, CommandType.UNMARK, tasks.size());
+        int index = Parser.parseTaskIndex(command, CommandType.UNMARK, tasks.getSize());
         Task task = tasks.get(index);
         task.markAsUndone();
         saveTasks();
@@ -119,10 +119,10 @@ public class Alex {
     }
 
     private void deleteTask(String command) throws AlexException, StorageException {
-        int index = Parser.parseTaskIndex(command, CommandType.DELETE, tasks.size());
+        int index = Parser.parseTaskIndex(command, CommandType.DELETE, tasks.getSize());
         Task removedTask = tasks.delete(index);
         saveTasks();
-        ui.showTaskDeleted(removedTask, tasks.size());
+        ui.showTaskDeleted(removedTask, tasks.getSize());
     }
 
     private void addTask(String command, CommandType commandType)
@@ -130,7 +130,7 @@ public class Alex {
         Task task = Parser.parseTask(command, commandType);
         tasks.add(task);
         saveTasks();
-        ui.showTaskAdded(task, tasks.size());
+        ui.showTaskAdded(task, tasks.getSize());
     }
 
     private void saveTasks() throws StorageException {

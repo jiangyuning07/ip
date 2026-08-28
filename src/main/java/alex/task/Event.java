@@ -8,20 +8,20 @@ import alex.util.DateParser;
  * Represents a task that occurs over a date range.
  */
 public class Event extends Task {
-    private final LocalDate from;
-    private final LocalDate to;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
     /**
      * Creates an event with a description and date range.
      *
      * @param description description of the event.
-     * @param from event start date.
-     * @param to event end date.
+     * @param startDate event start date.
+     * @param endDate event end date.
      */
-    public Event(String description, LocalDate from, LocalDate to) {
+    public Event(String description, LocalDate startDate, LocalDate endDate) {
         super(description);
-        this.from = from;
-        this.to = to;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     /**
@@ -29,7 +29,8 @@ public class Event extends Task {
      */
     @Override
     public String toDataString() {
-        return "E | " + getDoneFlag() + " | " + getDescription() + " | " + from + " | " + to;
+        return "E | " + getDoneFlag() + " | " + getDescription()
+                + " | " + startDate + " | " + endDate;
     }
 
     /**
@@ -38,7 +39,7 @@ public class Event extends Task {
     @Override
     public String toString() {
         return "[E]" + super.toString()
-                + " (from: " + DateParser.format(from)
-                + " to: " + DateParser.format(to) + ")";
+                + " (from: " + DateParser.format(startDate)
+                + " to: " + DateParser.format(endDate) + ")";
     }
 }

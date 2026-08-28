@@ -21,7 +21,7 @@ public class Parser {
      * @return the matching command type.
      */
     public static CommandType parseCommandType(String command) {
-        return CommandType.from(command);
+        return CommandType.parse(command);
     }
 
     /**
@@ -86,54 +86,55 @@ public class Parser {
 
     private static Task parseDeadline(String command) throws AlexException {
         String details = getArguments(command, CommandType.DEADLINE);
-        int bySeparator = details.indexOf("/by");
+        int dueDateSeparator = details.indexOf("/by");
 
-        if (bySeparator < 0) {
+        if (dueDateSeparator < 0) {
             throw new AlexException("A deadline needs a description and a /by date.");
         }
 
-        String description = details.substring(0, bySeparator).trim();
-        String byText = details.substring(bySeparator + "/by".length()).trim();
+        String description = details.substring(0, dueDateSeparator).trim();
+        String dueDateText = details.substring(dueDateSeparator + "/by".length()).trim();
         if (description.isEmpty()) {
             throw new AlexException("The deadline description cannot be empty.");
         }
-        if (byText.isEmpty()) {
+        if (dueDateText.isEmpty()) {
             throw new AlexException("The deadline date cannot be empty.");
         }
 
-        LocalDate by = DateParser.parse(byText);
-        return new Deadline(description, by);
+        LocalDate dueDate = DateParser.parse(dueDateText);
+        return new Deadline(description, dueDate);
     }
 
     private static Task parseEvent(String command) throws AlexException {
         String details = getArguments(command, CommandType.EVENT);
-        int fromSeparator = details.indexOf("/from");
+        int startDateSeparator = details.indexOf("/from");
 
-        if (fromSeparator < 0) {
+        if (startDateSeparator < 0) {
             throw new AlexException("An event needs a description, a /from date, and a /to date.");
         }
 
-        int toSeparator = details.indexOf("/to", fromSeparator + "/from".length());
-        if (toSeparator < 0) {
+        int endDateSeparator = details.indexOf("/to", startDateSeparator + "/from".length());
+        if (endDateSeparator < 0) {
             throw new AlexException("Please specify the event's end date using /to.");
         }
 
-        String description = details.substring(0, fromSeparator).trim();
-        String fromText = details.substring(fromSeparator + "/from".length(), toSeparator).trim();
-        String toText = details.substring(toSeparator + "/to".length()).trim();
+        String description = details.substring(0, startDateSeparator).trim();
+        String startDateText = details.substring(
+                startDateSeparator + "/from".length(), endDateSeparator).trim();
+        String endDateText = details.substring(endDateSeparator + "/to".length()).trim();
         if (description.isEmpty()) {
             throw new AlexException("The event description cannot be empty.");
         }
-        if (fromText.isEmpty()) {
+        if (startDateText.isEmpty()) {
             throw new AlexException("The event start date cannot be empty.");
         }
-        if (toText.isEmpty()) {
+        if (endDateText.isEmpty()) {
             throw new AlexException("The event end date cannot be empty.");
         }
 
-        LocalDate from = DateParser.parse(fromText);
-        LocalDate to = DateParser.parse(toText);
-        return new Event(description, from, to);
+        LocalDate startDate = DateParser.parse(startDateText);
+        LocalDate endDate = DateParser.parse(endDateText);
+        return new Event(description, startDate, endDate);
     }
 
     private static String getArguments(String command, CommandType commandType) {
