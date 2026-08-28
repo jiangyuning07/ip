@@ -17,15 +17,32 @@ public enum CommandType {
     private final String keyword;
     private final boolean accArgs;
 
+    /**
+     * Creates a command type with its keyword and argument policy.
+     *
+     * @param keyword text that identifies the command.
+     * @param accArgs whether the command accepts arguments.
+     */
     CommandType(String keyword, boolean accArgs) {
         this.keyword = keyword;
         this.accArgs = accArgs;
     }
 
+    /**
+     * Returns the keyword that identifies this command type.
+     *
+     * @return the command keyword.
+     */
     public String getKeyword() {
         return keyword;
     }
 
+    /**
+     * Identifies the type of a user command.
+     *
+     * @param command full user command.
+     * @return the matching command type, or {@link #UNKNOWN}.
+     */
     public static CommandType from(String command) {
         for (CommandType type : values()) {
             if (type == UNKNOWN) {

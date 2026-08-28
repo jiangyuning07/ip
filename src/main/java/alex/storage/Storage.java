@@ -19,6 +19,11 @@ import alex.task.Todo;
 public class Storage {
     private final Path filePath;
 
+    /**
+     * Creates storage backed by the specified data file.
+     *
+     * @param filePath path of the task data file.
+     */
     public Storage(Path filePath) {
         this.filePath = filePath;
     }
@@ -26,8 +31,8 @@ public class Storage {
     /**
      * Loads tasks from the data file. A missing file represents an empty task list.
      *
-     * @return tasks reconstructed from the data file
-     * @throws StorageException if an existing file cannot be read or contains invalid data
+     * @return tasks reconstructed from the data file.
+     * @throws StorageException if an existing file cannot be read or contains invalid data.
      */
     public ArrayList<Task> loadTasks() throws StorageException {
         ArrayList<Task> tasks = new ArrayList<>();
@@ -68,8 +73,8 @@ public class Storage {
     /**
      * Reconstructs the correct task subtype from one line's fields.
      *
-     * @param fields fields read from one line in the data file
-     * @return the reconstructed task
+     * @param fields fields read from one line in the data file.
+     * @return the reconstructed task.
      */
     private Task createTask(String[] fields) {
         if (fields.length < 2) {
@@ -114,8 +119,8 @@ public class Storage {
     /**
      * Replaces the data file with the current task list, creating its directory if necessary.
      *
-     * @param tasks current tasks to save
-     * @throws StorageException if the directory or file cannot be written
+     * @param tasks current tasks to save.
+     * @throws StorageException if the directory or file cannot be written.
      */
     public void saveTasks(List<Task> tasks) throws StorageException {
         try {
