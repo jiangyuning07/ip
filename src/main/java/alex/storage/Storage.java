@@ -100,7 +100,7 @@ public class Storage {
                 return new Event(fields[2], LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
             default:
                 throw new IllegalArgumentException("unknown task type '" + taskType + "'");
-            }
+        }
     }
 
     private void validateFields(String[] fields, int expectedFieldCount) {

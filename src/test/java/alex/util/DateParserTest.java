@@ -47,8 +47,8 @@ public class DateParserTest {
      */
     @Test
     public void parse_invalidFormat_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class,
-                () -> DateParser.parse("28-08-2026"));
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parse("28-08-2026"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
                 + "for example 2019-12-02.",
@@ -60,8 +60,8 @@ public class DateParserTest {
      */
     @Test
     public void parse_impossibleDate_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class,
-                () -> DateParser.parse("2026-02-30"));
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parse("2026-02-30"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
                 + "for example 2019-12-02.",
@@ -73,8 +73,8 @@ public class DateParserTest {
      */
     @Test
     public void parse_nonLeapYearFebruary29_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class,
-                () -> DateParser.parse("2025-02-29"));
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parse("2025-02-29"));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
                 + "for example 2019-12-02.",
@@ -86,8 +86,8 @@ public class DateParserTest {
      */
     @Test
     public void parse_emptyInput_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class,
-                () -> DateParser.parse(""));
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parse(""));
 
         assertEquals("Please enter the date in yyyy-MM-dd format, "
                 + "for example 2019-12-02.",
