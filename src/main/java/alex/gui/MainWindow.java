@@ -11,6 +11,9 @@ import javafx.scene.layout.VBox;
  * Controls the main application window.
  */
 public class MainWindow {
+    private static final String WELCOME_MESSAGE =
+            "Hello! I'm Alex.\nWhat can I do for you?";
+
     private final Image userImage = new Image(
             getClass().getResourceAsStream("/images/DaUser.png"));
 
@@ -32,6 +35,8 @@ public class MainWindow {
     private void initialize() {
         dialogContainer.heightProperty().addListener((
                 observable, oldHeight, newHeight) -> scrollPane.setVvalue(1.0));
+
+        dialogContainer.getChildren().add(DialogBox.getAlexDialog(WELCOME_MESSAGE, alexImage));
     }
 
     /**
