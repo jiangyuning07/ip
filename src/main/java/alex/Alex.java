@@ -1,6 +1,7 @@
 package alex;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import alex.exception.AlexException;
 import alex.parser.CommandType;
@@ -56,7 +57,10 @@ public class Alex {
             CommandType commandType = Parser.parseCommandType(command);
 
             try {
-                if (!executeCommand(command, commandType)) {
+                String response = executeCommand(command, commandType);
+                ui.showResponse(response);
+
+                if (commandType == CommandType.BYE) {
                     break;
                 }
             } catch (AlexException e) {
@@ -69,76 +73,119 @@ public class Alex {
     }
 
     /**
-     * Executes one parsed command.
+     * Processes a user command and returns Alex's response.
+     *
+     * @param input user command.
+     * @return Alex's response.
+     */
+    public String getResponse(String input) {
+        if (loadingError != null) {
+            return "Sorry! " + loadingError
+                    + "\nPlease repair or remove the data file, then restart Alex.";
+        }
+
+        String command = input.trim();
+        CommandType commandType = Parser.parseCommandType(command);
+
+        try {
+            return executeCommand(command, commandType);
+        } catch (AlexException | StorageException e) {
+            return "Sorry! " + e.getMessage();
+        }
+    }
+
+    /**
+     * Executes one parsed command and returns Alex's response.
      *
      * @param command full user command.
      * @param commandType parsed type of the command.
-     * @return false when Alex should stop accepting commands.
+     * @return Alex's response.
+     * @throws AlexException if the command is invalid.
+     * @throws StorageException if the updated tasks cannot be saved.
      */
-    private boolean executeCommand(String command, CommandType commandType)
+    private String executeCommand(String command, CommandType commandType)
             throws AlexException, StorageException {
-        switch (commandType) {
-            case BYE:
-                ui.showFarewell();
-                return false;
-            case LIST:
-                ui.showTaskList(tasks);
-                break;
-            case MARK:
-                markTask(command);
-                break;
-            case UNMARK:
-                unmarkTask(command);
-                break;
-            case DELETE:
-                deleteTask(command);
-                break;
-            case FIND:
-                findTasks(command);
-                break;
-            case TODO, DEADLINE, EVENT:
-                addTask(command, commandType);
-                break;
-            default:
-                throw new AlexException("I don't recognize that command.");
-        }
-        return true;
+        return switch (commandType) {
+            case BYE -> "Bye. Hope to see you again soon!";
+            case LIST -> getTaskListResponse();
+            case MARK -> markTask(command);
+            case UNMARK -> unmarkTask(command);
+            case DELETE -> deleteTask(command);
+            case FIND -> findTasks(command);
+            case TODO, DEADLINE, EVENT -> addTask(command, commandType);
+            case UNKNOWN -> throw new AlexException("I don't recognize that command.");
+        };
     }
 
-    private void markTask(String command) throws AlexException, StorageException {
+    private String markTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.MARK, tasks.getSize());
         Task task = tasks.get(index);
         task.markAsDone();
         saveTasks();
-        ui.showTaskMarked(task);
+
+        return "Nice! I've marked this task as done:\n"
+                + "   " + task;
     }
 
-    private void unmarkTask(String command) throws AlexException, StorageException {
+    private String unmarkTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.UNMARK, tasks.getSize());
         Task task = tasks.get(index);
         task.markAsUndone();
         saveTasks();
-        ui.showTaskUnmarked(task);
+
+        return "OK, I've marked this task as not done yet:\n"
+                + "   " + task;
     }
 
-    private void deleteTask(String command) throws AlexException, StorageException {
+    private String deleteTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.DELETE, tasks.getSize());
         Task removedTask = tasks.delete(index);
         saveTasks();
-        ui.showTaskDeleted(removedTask, tasks.getSize());
+
+        return "Noted. I've removed this task:\n"
+                + "   " + removedTask + "\n"
+                + "Now you have " + tasks.getSize() + " task(s) in the list.";
     }
 
-    private void findTasks(String command) throws AlexException {
+    private String getTaskListResponse() {
+        StringBuilder response = new StringBuilder(
+                "Here are the tasks in your list:");
+
+        for (int i = 0; i < tasks.getSize(); i++) {
+            response.append("\n ")
+                    .append(i + 1)
+                    .append(".")
+                    .append(tasks.get(i));
+        }
+
+        return response.toString();
+    }
+
+    private String findTasks(String command) throws AlexException {
         String keyword = Parser.parseFindKeyword(command);
-        ui.showMatchingTasks(tasks.find(keyword));
+        List<Task> matchingTasks = tasks.find(keyword);
+        StringBuilder response = new StringBuilder(
+                "Here are the matching tasks in your list:");
+
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            response.append("\n ")
+                    .append(i + 1)
+                    .append(".")
+                    .append(matchingTasks.get(i));
+        }
+
+        return response.toString();
     }
 
-    private void addTask(String command, CommandType commandType)
+    private String addTask(String command, CommandType commandType)
             throws AlexException, StorageException {
         Task task = Parser.parseTask(command, commandType);
         tasks.add(task);
         saveTasks();
-        ui.showTaskAdded(task, tasks.getSize());
+
+        return "Got it. I've added this task:\n"
+                + "   " + task + "\n"
+                + "Now you have " + tasks.getSize() + " task(s) in the list.";
     }
 
     private void saveTasks() throws StorageException {

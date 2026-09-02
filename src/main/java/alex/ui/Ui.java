@@ -90,6 +90,15 @@ public class Ui {
     }
 
     /**
+     * Displays a response from Alex.
+     *
+     * @param response response to display.
+     */
+    public void showResponse(String response) {
+        showMessage(response);
+    }
+
+    /**
      * Displays confirmation that a task was added.
      *
      * @param task added task.
