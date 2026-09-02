@@ -19,7 +19,7 @@ public class TaskListTest {
         Task readBook = new Todo("read book");
         Task returnBook = new Deadline("return book", LocalDate.of(2026, 6, 6));
         Task unrelatedTask = new Todo("buy groceries");
-        TaskList tasks = new TaskList(List.of(readBook, returnBook, unrelatedTask));
+        TaskList tasks = new TaskList(readBook, returnBook, unrelatedTask);
 
         assertEquals(List.of(readBook, returnBook), tasks.find("book"));
     }
@@ -29,7 +29,7 @@ public class TaskListTest {
      */
     @Test
     public void find_keywordAbsent_returnsEmptyList() {
-        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+        TaskList tasks = new TaskList(new Todo("read book"));
 
         assertEquals(List.of(), tasks.find("movie"));
     }
