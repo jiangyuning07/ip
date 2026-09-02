@@ -21,6 +21,15 @@ public class TaskList {
      *
      * @param tasks initial tasks.
      */
+    public TaskList(Task... tasks) {
+        this.tasks = new ArrayList<>(List.of(tasks));
+    }
+
+    /**
+     * Creates a task list containing copies of the supplied references.
+     *
+     * @param tasks initial tasks.
+     */
     public TaskList(List<Task> tasks) {
         this.tasks = new ArrayList<>(tasks);
     }
