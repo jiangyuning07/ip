@@ -54,17 +54,8 @@ public class Storage {
      * @throws StorageException if an existing file cannot be read or contains invalid data.
      */
     public ArrayList<Task> loadTasks() throws StorageException {
+        List<String> lines = readTaskLines();
         ArrayList<Task> tasks = new ArrayList<>();
-
-        List<String> lines;
-        try {
-            if (Files.notExists(filePath)) {
-                return tasks;
-            }
-            lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new StorageException("I couldn't read the data file at " + filePath + ".", e);
-        }
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -72,22 +63,52 @@ public class Storage {
                 continue;
             }
 
-            try {
-                String[] fields = line.split(
-                        FIELD_SEPARATOR_REGEX, SPLIT_LIMIT_PRESERVE_TRAILING_EMPTY_FIELDS);
-                Task task = createTask(fields);
-
-                if (fields[FIELD_INDEX_COMPLETION_STATUS].equals(STATUS_COMPLETE)) {
-                    task.markAsDone();
-                }
-                tasks.add(task);
-            } catch (IllegalArgumentException e) {
-                throw new StorageException("The data file is invalid at line " + (i + 1)
-                        + ": " + e.getMessage(), e);
-            }
+            Task task = parseTaskLine(line, i + 1);
+            tasks.add(task);
         }
 
         return tasks;
+    }
+
+    /**
+     * Reads serialized task lines, treating a missing data file as an empty task list.
+     *
+     * @return lines read from the data file.
+     * @throws StorageException if an existing file cannot be read.
+     */
+    private List<String> readTaskLines() throws StorageException {
+        try {
+            if (Files.notExists(filePath)) {
+                return List.of();
+            }
+            return Files.readAllLines(filePath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new StorageException("I couldn't read the data file at " + filePath + ".", e);
+        }
+    }
+
+    /**
+     * Reconstructs a task and adds its line number to invalid-data errors.
+     *
+     * @param line serialized task line.
+     * @param lineNumber one-based data-file line number.
+     * @return task reconstructed from the line.
+     * @throws StorageException if the line contains invalid task data.
+     */
+    private Task parseTaskLine(String line, int lineNumber) throws StorageException {
+        try {
+            String[] fields = line.split(
+                    FIELD_SEPARATOR_REGEX, SPLIT_LIMIT_PRESERVE_TRAILING_EMPTY_FIELDS);
+            Task task = createTask(fields);
+
+            if (fields[FIELD_INDEX_COMPLETION_STATUS].equals(STATUS_COMPLETE)) {
+                task.markAsDone();
+            }
+            return task;
+        } catch (IllegalArgumentException e) {
+            throw new StorageException("The data file is invalid at line " + lineNumber
+                    + ": " + e.getMessage(), e);
+        }
     }
 
     /**
