@@ -148,30 +148,23 @@ public class Alex {
     }
 
     private String getTaskListResponse() {
-        StringBuilder response = new StringBuilder(
-                "Here are the tasks in your list:");
-
-        for (int i = 0; i < tasks.getSize(); i++) {
-            response.append("\n ")
-                    .append(i + 1)
-                    .append(".")
-                    .append(tasks.get(i));
-        }
-
-        return response.toString();
+        return formatTasks("Here are the tasks in your list:", tasks.getTasks());
     }
 
     private String findTasks(String command) throws AlexException {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
-        StringBuilder response = new StringBuilder(
-                "Here are the matching tasks in your list:");
+        return formatTasks("Here are the matching tasks in your list:", matchingTasks);
+    }
 
-        for (int i = 0; i < matchingTasks.size(); i++) {
+    private static String formatTasks(String heading, List<Task> tasksToFormat) {
+        StringBuilder response = new StringBuilder(heading);
+
+        for (int i = 0; i < tasksToFormat.size(); i++) {
             response.append("\n ")
                     .append(i + 1)
                     .append(".")
-                    .append(matchingTasks.get(i));
+                    .append(tasksToFormat.get(i));
         }
 
         return response.toString();
