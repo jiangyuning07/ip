@@ -23,7 +23,7 @@ public class Task {
      * @return {@code X} if complete, or a space otherwise.
      */
     public String getStatusIcon() {
-        return (isDone ? "X" : " "); // mark done task with X
+        return isDone ? "X" : " ";
     }
 
     /**
