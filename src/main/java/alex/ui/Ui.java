@@ -1,10 +1,6 @@
 package alex.ui;
 
-import java.util.List;
 import java.util.Scanner;
-
-import alex.task.Task;
-import alex.task.TaskList;
 
 /**
  * Handles console input and output for Alex.
@@ -57,93 +53,12 @@ public class Ui {
     }
 
     /**
-     * Displays Alex's farewell message.
-     */
-    public void showFarewell() {
-        showMessage("Bye. Hope to see you again soon!");
-    }
-
-    /**
-     * Displays all tasks in their current order.
-     *
-     * @param tasks tasks to display.
-     */
-    public void showTaskList(TaskList tasks) {
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.getSize(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
-        }
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays tasks that match a search keyword.
-     *
-     * @param matchingTasks tasks to display.
-     */
-    public void showMatchingTasks(List<Task> matchingTasks) {
-        System.out.println("Here are the matching tasks in your list:");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
-        }
-        System.out.println(DIVIDER);
-    }
-
-    /**
      * Displays a response from Alex.
      *
      * @param response response to display.
      */
     public void showResponse(String response) {
         showMessage(response);
-    }
-
-    /**
-     * Displays confirmation that a task was added.
-     *
-     * @param task added task.
-     * @param taskCount updated task count.
-     */
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task:");
-        System.out.println("   " + task);
-        System.out.println("Now you have " + taskCount + " task(s) in the list.");
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays confirmation that a task was deleted.
-     *
-     * @param task deleted task.
-     * @param taskCount updated task count.
-     */
-    public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println("Now you have " + taskCount + " task(s) in the list.");
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays confirmation that a task was marked complete.
-     *
-     * @param task updated task.
-     */
-    public void showTaskMarked(Task task) {
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("   " + task);
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Displays confirmation that a task was marked incomplete.
-     *
-     * @param task updated task.
-     */
-    public void showTaskUnmarked(Task task) {
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
-        System.out.println(DIVIDER);
     }
 
     /**
