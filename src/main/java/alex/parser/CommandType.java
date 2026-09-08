@@ -1,5 +1,7 @@
 package alex.parser;
 
+import java.util.Arrays;
+
 /**
  * Represents a command supported by Alex.
  */
@@ -45,20 +47,11 @@ public enum CommandType {
      * @return the matching command type, or {@link #UNKNOWN}.
      */
     public static CommandType parse(String command) {
-        for (CommandType type : values()) {
-            if (type == UNKNOWN) {
-                continue;
-            }
-
-            if (command.equals(type.keyword)) {
-                return type;
-            }
-
-            if (type.canAcceptArguments && command.startsWith(type.keyword + " ")) {
-                return type;
-            }
-        }
-
-        return UNKNOWN;
+        return Arrays.stream(values())
+                .filter(type -> type != UNKNOWN)
+                .filter(type -> command.equals(type.keyword)
+                        || (type.canAcceptArguments && command.startsWith(type.keyword + " ")))
+                .findFirst()
+                .orElse(UNKNOWN);
     }
 }
