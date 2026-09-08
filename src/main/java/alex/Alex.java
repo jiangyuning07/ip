@@ -19,7 +19,7 @@ public class Alex {
     private final Storage storage;
     private final Ui ui;
     private final TaskList tasks;
-    private final String loadingError;
+    private final String loadingErrorMessage;
 
     /**
      * Creates Alex and loads its saved tasks.
@@ -31,15 +31,15 @@ public class Alex {
         storage = new Storage(Path.of(filePath));
 
         TaskList loadedTasks;
-        String error = null;
+        String loadingErrorMessage = null;
         try {
             loadedTasks = new TaskList(storage.loadTasks());
         } catch (StorageException e) {
             loadedTasks = new TaskList();
-            error = e.getMessage();
+            loadingErrorMessage = e.getMessage();
         }
         tasks = loadedTasks;
-        loadingError = error;
+        this.loadingErrorMessage = loadingErrorMessage;
     }
 
     /**
@@ -47,8 +47,8 @@ public class Alex {
      */
     public void run() {
         ui.showWelcome();
-        if (loadingError != null) {
-            ui.showLoadingError(loadingError);
+        if (loadingErrorMessage != null) {
+            ui.showLoadingError(loadingErrorMessage);
             return;
         }
 
@@ -79,8 +79,8 @@ public class Alex {
      * @return Alex's response.
      */
     public String getResponse(String input) {
-        if (loadingError != null) {
-            return "Sorry! " + loadingError
+        if (loadingErrorMessage != null) {
+            return "Sorry! " + loadingErrorMessage
                     + "\nPlease repair or remove the data file, then restart Alex.";
         }
 
