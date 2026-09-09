@@ -38,6 +38,14 @@ public class Parser {
      */
     public static int parseTaskIndex(String command, CommandType commandType, int taskCount)
             throws AlexException {
+        assert taskCount >= 0 : "Task count cannot be negative";
+        assert commandType == CommandType.MARK
+                || commandType == CommandType.UNMARK
+                || commandType == CommandType.DELETE
+                : "Only task-selection commands have a task index";
+        assert CommandType.parse(command) == commandType
+                : "Command type must match the command text";
+
         String commandName = commandType.getKeyword();
         String taskNumberText = command.substring(commandName.length()).trim();
 
@@ -59,7 +67,10 @@ public class Parser {
             throw new AlexException("Please choose a task number from 1 to " + taskCount + ".");
         }
 
-        return taskNumber - 1;
+        int taskIndex = taskNumber - 1;
+        assert taskIndex >= 0 && taskIndex < taskCount
+                : "Parsed task index must be within the task list";
+        return taskIndex;
     }
 
     /**
@@ -86,6 +97,11 @@ public class Parser {
      * @throws AlexException if required task details are missing or invalid.
      */
     public static Task parseTask(String command, CommandType commandType) throws AlexException {
+        assert commandType == CommandType.TODO
+                || commandType == CommandType.DEADLINE
+                || commandType == CommandType.EVENT
+                : "Only task-creation commands can be parsed as tasks";
+
         return switch (commandType) {
             case TODO -> parseTodo(command);
             case DEADLINE -> parseDeadline(command);
@@ -162,6 +178,8 @@ public class Parser {
     }
 
     private static String getArguments(String command, CommandType commandType) {
+        assert CommandType.parse(command) == commandType
+                : "Command type must match the command text";
         return command.substring(commandType.getKeyword().length()).trim();
     }
 }

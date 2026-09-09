@@ -105,6 +105,9 @@ public class Alex {
      */
     private String executeCommand(String command, CommandType commandType)
             throws AlexException, StorageException {
+        assert commandType == Parser.parseCommandType(command)
+                : "Command type must match the command text";
+
         return switch (commandType) {
             case BYE -> "Bye. Hope to see you again soon!";
             case LIST -> getTaskListResponse();
@@ -172,6 +175,11 @@ public class Alex {
 
     private String addTask(String command, CommandType commandType)
             throws AlexException, StorageException {
+        assert commandType == CommandType.TODO
+                || commandType == CommandType.DEADLINE
+                || commandType == CommandType.EVENT
+                : "Only task-creation commands can add tasks";
+
         Task task = Parser.parseTask(command, commandType);
         tasks.add(task);
         saveTasks();
