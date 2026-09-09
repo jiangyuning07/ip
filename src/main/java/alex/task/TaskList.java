@@ -22,6 +22,8 @@ public class TaskList {
      * @param tasks initial tasks.
      */
     public TaskList(Task... tasks) {
+        assert tasks != null : "Initial task array cannot be null";
+
         this.tasks = new ArrayList<>(List.of(tasks));
     }
 
@@ -31,6 +33,9 @@ public class TaskList {
      * @param tasks initial tasks.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "Initial task list cannot be null";
+        assert !tasks.contains(null) : "Initial task list cannot contain null";
+
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -59,6 +64,8 @@ public class TaskList {
      * @param task task to add.
      */
     public void add(Task task) {
+        assert task != null : "Added task cannot be null";
+
         tasks.add(task);
     }
 
