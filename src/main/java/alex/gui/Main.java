@@ -1,6 +1,5 @@
 package alex.gui;
 
-
 import java.io.IOException;
 
 import alex.Alex;

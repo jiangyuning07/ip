@@ -19,7 +19,7 @@ public class Alex {
     private final Storage storage;
     private final Ui ui;
     private final TaskList tasks;
-    private final String loadingError;
+    private final String loadingErrorMessage;
 
     /**
      * Creates Alex and loads its saved tasks.
@@ -31,15 +31,15 @@ public class Alex {
         storage = new Storage(Path.of(filePath));
 
         TaskList loadedTasks;
-        String error = null;
+        String loadingErrorMessage = null;
         try {
             loadedTasks = new TaskList(storage.loadTasks());
         } catch (StorageException e) {
             loadedTasks = new TaskList();
-            error = e.getMessage();
+            loadingErrorMessage = e.getMessage();
         }
         tasks = loadedTasks;
-        loadingError = error;
+        this.loadingErrorMessage = loadingErrorMessage;
     }
 
     /**
@@ -47,8 +47,8 @@ public class Alex {
      */
     public void run() {
         ui.showWelcome();
-        if (loadingError != null) {
-            ui.showLoadingError(loadingError);
+        if (loadingErrorMessage != null) {
+            ui.showLoadingError(loadingErrorMessage);
             return;
         }
 
@@ -79,8 +79,8 @@ public class Alex {
      * @return Alex's response.
      */
     public String getResponse(String input) {
-        if (loadingError != null) {
-            return "Sorry! " + loadingError
+        if (loadingErrorMessage != null) {
+            return "Sorry! " + loadingErrorMessage
                     + "\nPlease repair or remove the data file, then restart Alex.";
         }
 
@@ -151,30 +151,23 @@ public class Alex {
     }
 
     private String getTaskListResponse() {
-        StringBuilder response = new StringBuilder(
-                "Here are the tasks in your list:");
-
-        for (int i = 0; i < tasks.getSize(); i++) {
-            response.append("\n ")
-                    .append(i + 1)
-                    .append(".")
-                    .append(tasks.get(i));
-        }
-
-        return response.toString();
+        return formatTasks("Here are the tasks in your list:", tasks.getTasks());
     }
 
     private String findTasks(String command) throws AlexException {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
-        StringBuilder response = new StringBuilder(
-                "Here are the matching tasks in your list:");
+        return formatTasks("Here are the matching tasks in your list:", matchingTasks);
+    }
 
-        for (int i = 0; i < matchingTasks.size(); i++) {
+    private static String formatTasks(String heading, List<Task> tasksToFormat) {
+        StringBuilder response = new StringBuilder(heading);
+
+        for (int i = 0; i < tasksToFormat.size(); i++) {
             response.append("\n ")
                     .append(i + 1)
                     .append(".")
-                    .append(matchingTasks.get(i));
+                    .append(tasksToFormat.get(i));
         }
 
         return response.toString();

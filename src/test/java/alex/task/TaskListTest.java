@@ -11,9 +11,6 @@ import org.junit.jupiter.api.Test;
  * Tests task-list search behavior.
  */
 public class TaskListTest {
-    /**
-     * Verifies that tasks containing a keyword in their descriptions are returned.
-     */
     @Test
     public void find_keywordInDescriptions_returnsMatchingTasks() {
         Task readBook = new Todo("read book");
@@ -24,9 +21,6 @@ public class TaskListTest {
         assertEquals(List.of(readBook, returnBook), tasks.find("book"));
     }
 
-    /**
-     * Verifies that an absent keyword produces an empty result.
-     */
     @Test
     public void find_keywordAbsent_returnsEmptyList() {
         TaskList tasks = new TaskList(new Todo("read book"));

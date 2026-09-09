@@ -17,6 +17,25 @@ import alex.task.Todo;
  * Loads and saves Alex's task list using a local data file.
  */
 public class Storage {
+    private static final String FIELD_SEPARATOR_REGEX = "\\s*\\|\\s*";
+    private static final String STATUS_INCOMPLETE = "0";
+    private static final String STATUS_COMPLETE = "1";
+    private static final String TASK_TYPE_TODO = "T";
+    private static final String TASK_TYPE_DEADLINE = "D";
+    private static final String TASK_TYPE_EVENT = "E";
+
+    private static final int SPLIT_LIMIT_PRESERVE_TRAILING_EMPTY_FIELDS = -1;
+    private static final int FIELD_INDEX_TASK_TYPE = 0;
+    private static final int FIELD_INDEX_COMPLETION_STATUS = 1;
+    private static final int FIELD_INDEX_FIRST_DETAIL = 2;
+    private static final int FIELD_INDEX_DEADLINE_DATE = 3;
+    private static final int FIELD_INDEX_EVENT_START_DATE = 3;
+    private static final int FIELD_INDEX_EVENT_END_DATE = 4;
+    private static final int FIELD_COUNT_REQUIRED_HEADER = 2;
+    private static final int FIELD_COUNT_TODO = 3;
+    private static final int FIELD_COUNT_DEADLINE = 4;
+    private static final int FIELD_COUNT_EVENT = 5;
+
     private final Path filePath;
 
     /**
@@ -35,17 +54,8 @@ public class Storage {
      * @throws StorageException if an existing file cannot be read or contains invalid data.
      */
     public ArrayList<Task> loadTasks() throws StorageException {
+        List<String> lines = readTaskLines();
         ArrayList<Task> tasks = new ArrayList<>();
-
-        List<String> lines;
-        try {
-            if (Files.notExists(filePath)) {
-                return tasks;
-            }
-            lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new StorageException("I couldn't read the data file at " + filePath + ".", e);
-        }
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -53,21 +63,52 @@ public class Storage {
                 continue;
             }
 
-            try {
-                String[] fields = line.split("\\s*\\|\\s*", -1);
-                Task task = createTask(fields);
-
-                if (fields[1].equals("1")) {
-                    task.markAsDone();
-                }
-                tasks.add(task);
-            } catch (IllegalArgumentException e) {
-                throw new StorageException("The data file is invalid at line " + (i + 1)
-                        + ": " + e.getMessage(), e);
-            }
+            Task task = parseTaskLine(line, i + 1);
+            tasks.add(task);
         }
 
         return tasks;
+    }
+
+    /**
+     * Reads serialized task lines, treating a missing data file as an empty task list.
+     *
+     * @return lines read from the data file.
+     * @throws StorageException if an existing file cannot be read.
+     */
+    private List<String> readTaskLines() throws StorageException {
+        try {
+            if (Files.notExists(filePath)) {
+                return List.of();
+            }
+            return Files.readAllLines(filePath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new StorageException("I couldn't read the data file at " + filePath + ".", e);
+        }
+    }
+
+    /**
+     * Reconstructs a task and adds its line number to invalid-data errors.
+     *
+     * @param line serialized task line.
+     * @param lineNumber one-based data-file line number.
+     * @return task reconstructed from the line.
+     * @throws StorageException if the line contains invalid task data.
+     */
+    private Task parseTaskLine(String line, int lineNumber) throws StorageException {
+        try {
+            String[] fields = line.split(
+                    FIELD_SEPARATOR_REGEX, SPLIT_LIMIT_PRESERVE_TRAILING_EMPTY_FIELDS);
+            Task task = createTask(fields);
+
+            if (fields[FIELD_INDEX_COMPLETION_STATUS].equals(STATUS_COMPLETE)) {
+                task.markAsDone();
+            }
+            return task;
+        } catch (IllegalArgumentException e) {
+            throw new StorageException("The data file is invalid at line " + lineNumber
+                    + ": " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -77,27 +118,30 @@ public class Storage {
      * @return the reconstructed task.
      */
     private Task createTask(String[] fields) {
-        if (fields.length < 2) {
+        if (fields.length < FIELD_COUNT_REQUIRED_HEADER) {
             throw new IllegalArgumentException("missing task type or completion status");
         }
 
-        String taskType = fields[0];
-        String status = fields[1];
+        String taskType = fields[FIELD_INDEX_TASK_TYPE];
+        String status = fields[FIELD_INDEX_COMPLETION_STATUS];
 
-        if (!status.equals("0") && !status.equals("1")) {
+        if (!status.equals(STATUS_INCOMPLETE) && !status.equals(STATUS_COMPLETE)) {
             throw new IllegalArgumentException("completion status must be 0 or 1");
         }
 
         switch (taskType) {
-            case "T":
-                validateFields(fields, 3);
-                return new Todo(fields[2]);
-            case "D":
-                validateFields(fields, 4);
-                return new Deadline(fields[2], LocalDate.parse(fields[3]));
-            case "E":
-                validateFields(fields, 5);
-                return new Event(fields[2], LocalDate.parse(fields[3]), LocalDate.parse(fields[4]));
+            case TASK_TYPE_TODO:
+                validateFields(fields, FIELD_COUNT_TODO);
+                return new Todo(fields[FIELD_INDEX_FIRST_DETAIL]);
+            case TASK_TYPE_DEADLINE:
+                validateFields(fields, FIELD_COUNT_DEADLINE);
+                return new Deadline(fields[FIELD_INDEX_FIRST_DETAIL],
+                        LocalDate.parse(fields[FIELD_INDEX_DEADLINE_DATE]));
+            case TASK_TYPE_EVENT:
+                validateFields(fields, FIELD_COUNT_EVENT);
+                return new Event(fields[FIELD_INDEX_FIRST_DETAIL],
+                        LocalDate.parse(fields[FIELD_INDEX_EVENT_START_DATE]),
+                        LocalDate.parse(fields[FIELD_INDEX_EVENT_END_DATE]));
             default:
                 throw new IllegalArgumentException("unknown task type '" + taskType + "'");
         }
@@ -109,7 +153,7 @@ public class Storage {
                     "expected " + expectedFieldCount + " fields, but found " + fields.length);
         }
 
-        for (int i = 2; i < fields.length; i++) {
+        for (int i = FIELD_INDEX_FIRST_DETAIL; i < fields.length; i++) {
             if (fields[i].isBlank()) {
                 throw new IllegalArgumentException("task details cannot be empty");
             }
