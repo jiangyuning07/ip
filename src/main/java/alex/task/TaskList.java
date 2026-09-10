@@ -2,6 +2,7 @@ package alex.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Manages the tasks currently held by Alex.
@@ -80,14 +81,16 @@ public class TaskList {
     }
 
     /**
-     * Returns tasks whose descriptions contain the specified keyword.
+     * Returns tasks whose descriptions contain the specified keyword, ignoring case.
      *
      * @param keyword keyword to search for.
      * @return matching tasks in their original order.
      */
     public List<Task> find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+
         return tasks.stream()
-                .filter(task -> task.getDescription().contains(keyword))
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .toList();
     }
 
