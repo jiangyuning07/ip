@@ -1,6 +1,7 @@
 package alex.gui;
 
 import alex.Alex;
+import alex.CommandResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -56,11 +57,11 @@ public class MainWindow {
             return;
         }
 
-        String response = alex.getResponse(input);
+        CommandResult result = alex.getResponse(input);
 
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getAlexDialog(response, alexImage));
+                DialogBox.getAlexDialog(result.text(), alexImage));
 
         userInput.clear();
     }

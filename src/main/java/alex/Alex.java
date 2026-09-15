@@ -76,21 +76,21 @@ public class Alex {
      * Processes a user command and returns Alex's response.
      *
      * @param input user command.
-     * @return Alex's response.
+     * @return result containing Alex's response and whether it is an error.
      */
-    public String getResponse(String input) {
+    public CommandResult getResponse(String input) {
         if (loadingErrorMessage != null) {
-            return "Sorry! " + loadingErrorMessage
-                    + "\nPlease repair or remove the data file, then restart Alex.";
+            return CommandResult.error("Sorry! " + loadingErrorMessage
+                    + "\nPlease repair or remove the data file, then restart Alex.");
         }
 
         String command = input.trim();
         CommandType commandType = Parser.parseCommandType(command);
 
         try {
-            return executeCommand(command, commandType);
+            return CommandResult.success(executeCommand(command, commandType));
         } catch (AlexException | StorageException e) {
-            return "Sorry! " + e.getMessage();
+            return CommandResult.error("Sorry! " + e.getMessage());
         }
     }
 
