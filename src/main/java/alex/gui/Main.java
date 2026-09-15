@@ -28,6 +28,8 @@ public class Main extends Application {
 
         Scene scene = new Scene(mainLayout);
         stage.setTitle("Alex");
+        stage.setMinHeight(420.0);
+        stage.setMinWidth(360.0);
         stage.setScene(scene);
         stage.show();
     }

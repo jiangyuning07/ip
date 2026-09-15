@@ -1,14 +1,16 @@
 .label {
-    -fx-background-color: #dbeafe;
+    -fx-background-color: #2563eb;
     -fx-background-radius: 12px 12px 2px 12px;
-    -fx-text-fill: #1e293b;
+    -fx-line-spacing: 2px;
+    -fx-padding: 9px 12px;
+    -fx-text-fill: white;
     -fx-font-size: 14px;
-    -fx-padding: 8px 10px 8px 10px;
 }
 
 .reply-label {
     -fx-background-color: #e2e8f0;
     -fx-background-radius: 12px 12px 12px 2px;
+    -fx-text-fill: #1e293b;
 }
 
 .error-label {

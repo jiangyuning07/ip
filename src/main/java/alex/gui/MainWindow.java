@@ -2,6 +2,7 @@ package alex.gui;
 
 import alex.Alex;
 import alex.CommandResult;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -35,6 +36,7 @@ public class MainWindow {
                 observable, oldHeight, newHeight) -> scrollPane.setVvalue(1.0));
 
         dialogContainer.getChildren().add(DialogBox.getAlexDialog(WELCOME_MESSAGE, alexImage));
+        Platform.runLater(userInput::requestFocus);
     }
 
     /**
@@ -51,6 +53,7 @@ public class MainWindow {
         String input = userInput.getText().trim();
 
         if (input.isEmpty()) {
+            userInput.clear();
             return;
         }
 
@@ -64,5 +67,6 @@ public class MainWindow {
                 responseDialog);
 
         userInput.clear();
+        userInput.requestFocus();
     }
 }

@@ -1,12 +1,48 @@
+.app-root {
+    -fx-background-color: #f8fafc;
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8px;
+    -fx-padding: 0 12px;
+    -fx-prompt-text-fill: #64748b;
+    -fx-text-fill: #0f172a;
+}
+
+.text-field:focused {
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.16), 6, 0, 0, 1);
+}
+
 .button {
     -fx-background-color: #2563eb;
-    -fx-background-radius: 6px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
+.button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.button:armed {
+    -fx-background-color: #1e40af;
+}
+
 .scroll-bar:vertical {
     -fx-background-color: transparent;
+    -fx-pref-width: 10px;
 }
 
 .scroll-bar:vertical .thumb {
