@@ -37,10 +37,13 @@ public class DialogBox extends HBox {
         }
 
         dialog.setText(text);
+        boolean hasImage = image != null;
+        displayPicture.setManaged(hasImage);
+        displayPicture.setVisible(hasImage);
         displayPicture.setImage(image);
         dialog.maxWidthProperty().bind(Bindings.max(
                 160.0,
-                Bindings.min(widthProperty().multiply(0.82), widthProperty().subtract(90.0))));
+                Bindings.min(widthProperty().multiply(0.88), widthProperty().subtract(60.0))));
     }
 
     private void flip() {
@@ -57,11 +60,10 @@ public class DialogBox extends HBox {
      * Creates a dialog representing a message from the user.
      *
      * @param text message to display.
-     * @param image image representing the user.
      * @return dialog containing the user's message.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+    public static DialogBox getUserDialog(String text) {
+        return new DialogBox(text, null);
     }
 
     /**

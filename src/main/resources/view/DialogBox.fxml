@@ -7,6 +7,7 @@
 <fx:root alignment="TOP_RIGHT"
          maxHeight="1.7976931348623157E308"
          maxWidth="1.7976931348623157E308"
+         spacing="8.0"
          stylesheets="@../css/dialog-box.css"
          type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17"
@@ -19,8 +20,8 @@
                wrapText="true" />
 
         <ImageView fx:id="displayPicture"
-                   fitHeight="60.0"
-                   fitWidth="60.0"
+                   fitHeight="32.0"
+                   fitWidth="32.0"
                    pickOnBounds="true"
                    preserveRatio="true" />
     </children>

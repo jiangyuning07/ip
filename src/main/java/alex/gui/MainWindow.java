@@ -15,9 +15,6 @@ public class MainWindow {
     private static final String WELCOME_MESSAGE =
             "Hello! I'm Alex.\nWhat can I do for you?";
 
-    private final Image userImage = new Image(
-            getClass().getResourceAsStream("/images/DaUser.png"));
-
     private final Image alexImage = new Image(
             getClass().getResourceAsStream("/images/DaAlex.png"));
 
@@ -63,7 +60,7 @@ public class MainWindow {
                 : DialogBox.getAlexDialog(result.text(), alexImage);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
+                DialogBox.getUserDialog(input),
                 responseDialog);
 
         userInput.clear();
