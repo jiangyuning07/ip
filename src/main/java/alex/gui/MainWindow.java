@@ -58,10 +58,13 @@ public class MainWindow {
         }
 
         CommandResult result = alex.getResponse(input);
+        DialogBox responseDialog = result.isError()
+                ? DialogBox.getErrorDialog(result.text(), alexImage)
+                : DialogBox.getAlexDialog(result.text(), alexImage);
 
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getAlexDialog(result.text(), alexImage));
+                responseDialog);
 
         userInput.clear();
     }

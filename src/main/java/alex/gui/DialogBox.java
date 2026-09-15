@@ -72,4 +72,17 @@ public class DialogBox extends HBox {
         dialogBox.flip();
         return dialogBox;
     }
+
+    /**
+     * Creates a dialog representing an error from Alex.
+     *
+     * @param text error message to display.
+     * @param image image representing Alex.
+     * @return dialog containing Alex's error message.
+     */
+    public static DialogBox getErrorDialog(String text, Image image) {
+        DialogBox dialogBox = getAlexDialog(text, image);
+        dialogBox.dialog.getStyleClass().add("error-label");
+        return dialogBox;
+    }
 }
