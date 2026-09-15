@@ -3,6 +3,7 @@ package alex.gui;
 import java.io.IOException;
 import java.util.Collections;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -37,6 +38,9 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(image);
+        dialog.maxWidthProperty().bind(Bindings.max(
+                160.0,
+                Bindings.min(widthProperty().multiply(0.82), widthProperty().subtract(90.0))));
     }
 
     private void flip() {
