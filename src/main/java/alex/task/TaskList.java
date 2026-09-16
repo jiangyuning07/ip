@@ -74,6 +74,18 @@ public class TaskList {
     }
 
     /**
+     * Adds a task at the specified zero-based index.
+     *
+     * @param index zero-based insertion index.
+     * @param task task to add.
+     */
+    public void add(int index, Task task) {
+        assert task != null : "Added task cannot be null";
+
+        tasks.add(index, task);
+    }
+
+    /**
      * Removes and returns the task at the specified zero-based index.
      *
      * @param index zero-based task index.
