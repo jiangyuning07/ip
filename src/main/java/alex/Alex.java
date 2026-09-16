@@ -184,6 +184,9 @@ public class Alex {
     private String findTasks(String command) throws AlexException {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
+        if (matchingTasks.isEmpty()) {
+            throw new AlexException("No matches found.");
+        }
         return formatTasks("Here are the matching tasks in your list:", matchingTasks);
     }
 

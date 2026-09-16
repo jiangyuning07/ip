@@ -57,4 +57,13 @@ public class AlexTest {
         assertEquals(new CommandResult(
                 "You have no incomplete deadlines due in the next 24 hours.", false), result);
     }
+
+    @Test
+    public void getResponse_findCommandWithoutMatches_returnsError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("find report");
+
+        assertEquals(new CommandResult("Sorry! No matches found.", true), result);
+    }
 }
