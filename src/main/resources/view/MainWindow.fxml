@@ -9,6 +9,7 @@
 
 <AnchorPane prefHeight="600.0"
             prefWidth="400.0"
+            styleClass="app-root"
             stylesheets="@../css/main.css"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -16,19 +17,20 @@
     <children>
         <ScrollPane fx:id="scrollPane"
                     fitToWidth="true"
+                    focusTraversable="false"
                     hbarPolicy="NEVER"
                     AnchorPane.topAnchor="0.0"
-                    AnchorPane.bottomAnchor="50.0"
+                    AnchorPane.bottomAnchor="58.0"
                     AnchorPane.leftAnchor="0.0"
                     AnchorPane.rightAnchor="0.0">
             <content>
                 <VBox fx:id="dialogContainer"
-                      spacing="10.0">
+                      spacing="8.0">
                     <padding>
-                        <Insets top="10.0"
-                                right="10.0"
-                                bottom="10.0"
-                                left="10.0" />
+                        <Insets top="12.0"
+                                right="12.0"
+                                bottom="12.0"
+                                left="12.0" />
                     </padding>
                 </VBox>
             </content>
@@ -36,17 +38,17 @@
 
         <TextField fx:id="userInput"
                    onAction="#handleUserInput"
-                   prefHeight="40.0"
+                   prefHeight="42.0"
                    promptText="Enter a command..."
-                   AnchorPane.bottomAnchor="5.0"
-                   AnchorPane.leftAnchor="5.0"
-                   AnchorPane.rightAnchor="80.0" />
+                   AnchorPane.bottomAnchor="8.0"
+                   AnchorPane.leftAnchor="8.0"
+                   AnchorPane.rightAnchor="88.0" />
 
         <Button text="Send"
                 onAction="#handleUserInput"
-                prefHeight="40.0"
-                prefWidth="70.0"
-                AnchorPane.bottomAnchor="5.0"
-                AnchorPane.rightAnchor="5.0" />
+                prefHeight="42.0"
+                prefWidth="72.0"
+                AnchorPane.bottomAnchor="8.0"
+                AnchorPane.rightAnchor="8.0" />
     </children>
 </AnchorPane>

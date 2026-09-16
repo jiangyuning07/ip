@@ -3,6 +3,7 @@ package alex.gui;
 import java.io.IOException;
 import java.util.Collections;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,7 +37,13 @@ public class DialogBox extends HBox {
         }
 
         dialog.setText(text);
+        boolean hasImage = image != null;
+        displayPicture.setManaged(hasImage);
+        displayPicture.setVisible(hasImage);
         displayPicture.setImage(image);
+        dialog.maxWidthProperty().bind(Bindings.max(
+                160.0,
+                Bindings.min(widthProperty().multiply(0.88), widthProperty().subtract(60.0))));
     }
 
     private void flip() {
@@ -53,11 +60,10 @@ public class DialogBox extends HBox {
      * Creates a dialog representing a message from the user.
      *
      * @param text message to display.
-     * @param image image representing the user.
      * @return dialog containing the user's message.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+    public static DialogBox getUserDialog(String text) {
+        return new DialogBox(text, null);
     }
 
     /**
@@ -70,6 +76,19 @@ public class DialogBox extends HBox {
     public static DialogBox getAlexDialog(String text, Image image) {
         DialogBox dialogBox = new DialogBox(text, image);
         dialogBox.flip();
+        return dialogBox;
+    }
+
+    /**
+     * Creates a dialog representing an error from Alex.
+     *
+     * @param text error message to display.
+     * @param image image representing Alex.
+     * @return dialog containing Alex's error message.
+     */
+    public static DialogBox getErrorDialog(String text, Image image) {
+        DialogBox dialogBox = getAlexDialog(text, image);
+        dialogBox.dialog.getStyleClass().add("error-label");
         return dialogBox;
     }
 }

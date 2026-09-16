@@ -1,6 +1,8 @@
 package alex.gui;
 
 import alex.Alex;
+import alex.CommandResult;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -13,9 +15,6 @@ import javafx.scene.layout.VBox;
 public class MainWindow {
     private static final String WELCOME_MESSAGE =
             "Hello! I'm Alex.\nWhat can I do for you?";
-
-    private final Image userImage = new Image(
-            getClass().getResourceAsStream("/images/DaUser.png"));
 
     private final Image alexImage = new Image(
             getClass().getResourceAsStream("/images/DaAlex.png"));
@@ -37,6 +36,7 @@ public class MainWindow {
                 observable, oldHeight, newHeight) -> scrollPane.setVvalue(1.0));
 
         dialogContainer.getChildren().add(DialogBox.getAlexDialog(WELCOME_MESSAGE, alexImage));
+        Platform.runLater(userInput::requestFocus);
     }
 
     /**
@@ -53,15 +53,20 @@ public class MainWindow {
         String input = userInput.getText().trim();
 
         if (input.isEmpty()) {
+            userInput.clear();
             return;
         }
 
-        String response = alex.getResponse(input);
+        CommandResult result = alex.getResponse(input);
+        DialogBox responseDialog = result.isError()
+                ? DialogBox.getErrorDialog(result.text(), alexImage)
+                : DialogBox.getAlexDialog(result.text(), alexImage);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getAlexDialog(response, alexImage));
+                DialogBox.getUserDialog(input),
+                responseDialog);
 
         userInput.clear();
+        userInput.requestFocus();
     }
 }
