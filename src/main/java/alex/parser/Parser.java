@@ -1,5 +1,10 @@
 package alex.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import alex.exception.AlexException;
 import alex.task.Deadline;
 import alex.task.Event;
@@ -15,6 +20,12 @@ public class Parser {
     private static final String DEADLINE_DATE_MARKER = "/by";
     private static final String EVENT_START_DATE_MARKER = "/from";
     private static final String EVENT_END_DATE_MARKER = "/to";
+    private static final Pattern DEADLINE_DATE_MARKER_PATTERN = Pattern.compile(
+            "(?<!\\S)" + Pattern.quote(DEADLINE_DATE_MARKER) + "(?!\\S)");
+    private static final Pattern EVENT_START_DATE_MARKER_PATTERN = Pattern.compile(
+            "(?<!\\S)" + Pattern.quote(EVENT_START_DATE_MARKER) + "(?!\\S)");
+    private static final Pattern EVENT_END_DATE_MARKER_PATTERN = Pattern.compile(
+            "(?<!\\S)" + Pattern.quote(EVENT_END_DATE_MARKER) + "(?!\\S)");
 
     /**
      * Identifies the type of a user command.
@@ -140,13 +151,15 @@ public class Parser {
 
     private static Task parseDeadline(String command) throws AlexException {
         String details = getArguments(command, CommandType.DEADLINE);
-        int dueDateSeparator = details.indexOf(DEADLINE_DATE_MARKER);
+        List<Integer> dueDateSeparators = findMarkerPositions(
+                details, DEADLINE_DATE_MARKER_PATTERN);
 
-        if (dueDateSeparator < 0) {
-            throw new AlexException("A deadline needs a description and a "
-                    + DEADLINE_DATE_MARKER + " date.");
+        if (dueDateSeparators.size() != 1) {
+            throw new AlexException("A deadline must contain exactly one standalone "
+                    + DEADLINE_DATE_MARKER + " delimiter.");
         }
 
+        int dueDateSeparator = dueDateSeparators.get(0);
         String description = details.substring(0, dueDateSeparator).trim();
         String dueDateText = details.substring(
                 dueDateSeparator + DEADLINE_DATE_MARKER.length()).trim();
@@ -164,18 +177,25 @@ public class Parser {
 
     private static Task parseEvent(String command) throws AlexException {
         String details = getArguments(command, CommandType.EVENT);
-        int startDateSeparator = details.indexOf(EVENT_START_DATE_MARKER);
+        List<Integer> startDateSeparators = findMarkerPositions(
+                details, EVENT_START_DATE_MARKER_PATTERN);
+        List<Integer> endDateSeparators = findMarkerPositions(
+                details, EVENT_END_DATE_MARKER_PATTERN);
 
-        if (startDateSeparator < 0) {
-            throw new AlexException("An event needs a description, a "
-                    + EVENT_START_DATE_MARKER + " date, and a " + EVENT_END_DATE_MARKER + " date.");
+        if (startDateSeparators.size() != 1) {
+            throw new AlexException("An event must contain exactly one standalone "
+                    + EVENT_START_DATE_MARKER + " delimiter.");
+        }
+        if (endDateSeparators.size() != 1) {
+            throw new AlexException("An event must contain exactly one standalone "
+                    + EVENT_END_DATE_MARKER + " delimiter.");
         }
 
-        int endDateSeparator = details.indexOf(
-                EVENT_END_DATE_MARKER, startDateSeparator + EVENT_START_DATE_MARKER.length());
-        if (endDateSeparator < 0) {
-            throw new AlexException("Please specify the event's end date using "
-                    + EVENT_END_DATE_MARKER + ".");
+        int startDateSeparator = startDateSeparators.get(0);
+        int endDateSeparator = endDateSeparators.get(0);
+        if (startDateSeparator >= endDateSeparator) {
+            throw new AlexException("An event's " + EVENT_START_DATE_MARKER
+                    + " delimiter must appear before its " + EVENT_END_DATE_MARKER + " delimiter.");
         }
 
         String description = details.substring(0, startDateSeparator).trim();
@@ -207,6 +227,23 @@ public class Parser {
         if (description.contains("|")) {
             throw new AlexException("Task descriptions cannot contain '|'.");
         }
+    }
+
+    /**
+     * Returns the starting positions of standalone markers in the supplied details.
+     * A marker is standalone when whitespace or a string boundary appears on each side.
+     *
+     * @param details command details to search.
+     * @param markerPattern pattern representing a standalone marker.
+     * @return marker positions in their original order.
+     */
+    private static List<Integer> findMarkerPositions(String details, Pattern markerPattern) {
+        ArrayList<Integer> markerPositions = new ArrayList<>();
+        Matcher matcher = markerPattern.matcher(details);
+        while (matcher.find()) {
+            markerPositions.add(matcher.start());
+        }
+        return markerPositions;
     }
 
     private static String getArguments(String command, CommandType commandType) {
