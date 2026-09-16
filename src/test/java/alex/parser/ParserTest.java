@@ -18,6 +18,11 @@ public class ParserTest {
     }
 
     @Test
+    public void parseCommandType_upcomingCommand_returnsUpcoming() {
+        assertEquals(CommandType.UPCOMING, Parser.parseCommandType("upcoming"));
+    }
+
+    @Test
     public void parseTaskIndex_firstTask_returnsZero() throws AlexException {
         assertEquals(0, Parser.parseTaskIndex("delete 1", CommandType.DELETE, 3));
     }

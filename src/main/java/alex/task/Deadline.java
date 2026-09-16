@@ -1,6 +1,8 @@
 package alex.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import alex.util.DateParser;
 import alex.util.TaskDateTime;
@@ -32,6 +34,17 @@ public class Deadline extends Task {
         assert dueDateTime != null : "Deadline due date and time cannot be null";
 
         this.dueDateTime = dueDateTime;
+    }
+
+    /**
+     * Returns the effective due date and time used for deadline comparisons.
+     * Date-only deadlines are treated as due at the end of their date.
+     *
+     * @return effective due date and time.
+     */
+    public LocalDateTime getEffectiveDueDateTime() {
+        LocalTime dueTime = dueDateTime.time().orElse(LocalTime.MAX);
+        return LocalDateTime.of(dueDateTime.date(), dueTime);
     }
 
     /**

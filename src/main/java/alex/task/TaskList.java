@@ -1,5 +1,6 @@
 package alex.task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -8,6 +9,8 @@ import java.util.Locale;
  * Manages the tasks currently held by Alex.
  */
 public class TaskList {
+    private static final int UPCOMING_WINDOW_HOURS = 24;
+
     private final List<Task> tasks;
 
     /**
@@ -91,6 +94,24 @@ public class TaskList {
 
         return tasks.stream()
                 .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
+                .toList();
+    }
+
+    /**
+     * Returns incomplete deadlines due within 24 hours of the specified time.
+     *
+     * @param currentDateTime beginning of the 24-hour window.
+     * @return matching deadlines in their original order.
+     */
+    public List<Task> findUpcomingDeadlines(LocalDateTime currentDateTime) {
+        assert currentDateTime != null : "Current date and time cannot be null";
+
+        LocalDateTime windowEnd = currentDateTime.plusHours(UPCOMING_WINDOW_HOURS);
+        return tasks.stream()
+                .filter(task -> task instanceof Deadline deadline
+                        && !deadline.isDone()
+                        && !deadline.getEffectiveDueDateTime().isBefore(currentDateTime)
+                        && !deadline.getEffectiveDueDateTime().isAfter(windowEnd))
                 .toList();
     }
 

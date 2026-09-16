@@ -44,6 +44,15 @@ public class Task {
     }
 
     /**
+     * Returns whether this task has been completed.
+     *
+     * @return {@code true} if this task is complete.
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
      * Returns this task in the format used by the data file.
      *
      * @return the serialized task.
