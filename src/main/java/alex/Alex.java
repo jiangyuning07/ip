@@ -1,6 +1,8 @@
 package alex;
 
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import alex.exception.AlexException;
@@ -19,6 +21,7 @@ public class Alex {
     private final Storage storage;
     private final Ui ui;
     private final TaskList tasks;
+    private final Clock clock;
     private final String loadingErrorMessage;
 
     /**
@@ -27,8 +30,21 @@ public class Alex {
      * @param filePath path of the task data file.
      */
     public Alex(String filePath) {
+        this(filePath, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates Alex with a clock for evaluating time-dependent commands.
+     *
+     * @param filePath path of the task data file.
+     * @param clock clock used to determine the current time.
+     */
+    Alex(String filePath, Clock clock) {
+        assert clock != null : "Clock cannot be null";
+
         ui = new Ui();
         storage = new Storage(Path.of(filePath));
+        this.clock = clock;
 
         TaskList loadedTasks;
         String loadingErrorMessage = null;
@@ -111,6 +127,7 @@ public class Alex {
         return switch (commandType) {
             case BYE -> "Bye. Hope to see you again soon!";
             case LIST -> getTaskListResponse();
+            case UPCOMING -> getUpcomingDeadlinesResponse();
             case MARK -> markTask(command);
             case UNMARK -> unmarkTask(command);
             case DELETE -> deleteTask(command);
@@ -154,9 +171,22 @@ public class Alex {
         return formatTasks("Here are the tasks in your list:", tasks.getTasks());
     }
 
+    private String getUpcomingDeadlinesResponse() {
+        List<Task> upcomingDeadlines = tasks.findUpcomingDeadlines(LocalDateTime.now(clock));
+        if (upcomingDeadlines.isEmpty()) {
+            return "You have no incomplete deadlines due in the next 24 hours.";
+        }
+        return formatTasks(
+                "Here are your incomplete deadlines due in the next 24 hours:",
+                upcomingDeadlines);
+    }
+
     private String findTasks(String command) throws AlexException {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
+        if (matchingTasks.isEmpty()) {
+            throw new AlexException("No matches found.");
+        }
         return formatTasks("Here are the matching tasks in your list:", matchingTasks);
     }
 

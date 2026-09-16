@@ -8,6 +8,7 @@ import java.util.Arrays;
 public enum CommandType {
     BYE("bye", false),
     LIST("list", false),
+    UPCOMING("upcoming", false),
     MARK("mark", true),
     UNMARK("unmark", true),
     DELETE("delete", true),
