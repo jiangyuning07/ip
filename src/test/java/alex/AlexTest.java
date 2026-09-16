@@ -67,13 +67,13 @@ public class AlexTest {
     }
 
     @Test
-    public void getResponse_findCommandWithoutMatches_returnsError() {
+    public void getResponse_findCommandWithoutMatches_returnsEmptyMessage() {
         Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
 
         CommandResult result = alex.getResponse("find report");
 
         assertEquals(new CommandResult(
-                "Nothing matching 'report'. Maybe it ordered under a different name.", true),
+                "Nothing matching 'report'. Maybe it ordered under a different name.", false),
                 result);
     }
 

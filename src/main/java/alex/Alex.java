@@ -222,8 +222,8 @@ public class Alex {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
         if (matchingTasks.isEmpty()) {
-            throw new AlexException("Nothing matching '" + keyword
-                    + "'. Maybe it ordered under a different name.");
+            return "Nothing matching '" + keyword
+                    + "'. Maybe it ordered under a different name.";
         }
         return formatTasks("Found these tucked behind the espresso machine:", matchingTasks);
     }
