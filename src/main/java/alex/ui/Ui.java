@@ -29,8 +29,8 @@ public class Ui {
     public void showWelcome() {
         System.out.println(DIVIDER);
         System.out.print(BANNER);
-        System.out.println("Hello! I'm Alex.");
-        System.out.println("What can I do for you?");
+        System.out.println("Hey. Welcome to Alex's.");
+        System.out.println("What can I get started for you?");
         System.out.println(DIVIDER);
     }
 
@@ -67,7 +67,7 @@ public class Ui {
      * @param message explanation of the error.
      */
     public void showError(String message) {
-        showMessage("Sorry! " + message);
+        showMessage(message);
     }
 
     /**
@@ -76,7 +76,7 @@ public class Ui {
      * @param message explanation of the loading error.
      */
     public void showLoadingError(String message) {
-        System.out.println("Sorry! " + message);
+        System.out.println(message);
         System.out.println("Please repair or remove the data file, then restart Alex.");
         System.out.println(DIVIDER);
     }

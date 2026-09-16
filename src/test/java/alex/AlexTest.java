@@ -49,7 +49,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("upcoming");
 
         assertEquals(new CommandResult(
-                "Here are your incomplete deadlines due in the next 24 hours:\n"
+                "These are due in the next 24 hours. They're starting to steam:\n"
                         + " 1.[D][ ] submit report (by: Sep 16 2026 1800)",
                 false), result);
     }
@@ -63,7 +63,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("upcoming");
 
         assertEquals(new CommandResult(
-                "You have no incomplete deadlines due in the next 24 hours.", false), result);
+                "Nothing due in the next 24 hours. Slow shift, apparently.", false), result);
     }
 
     @Test
@@ -72,7 +72,9 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("find report");
 
-        assertEquals(new CommandResult("Sorry! No matches found.", true), result);
+        assertEquals(new CommandResult(
+                "Nothing matching 'report'. Maybe it ordered under a different name.", true),
+                result);
     }
 
     @Test
@@ -81,24 +83,24 @@ public class AlexTest {
         Alex alex = new Alex(dataFile.toString());
 
         assertEquals(new CommandResult(
-                "Got it. I've added this task:\n"
+                "One task, house blend. Added to your order:\n"
                         + "   [T][ ] read book\n"
-                        + "Now you have 1 task(s) in the list.", false),
+                        + "You've got 1 item(s) brewing.", false),
                 alex.getResponse("todo read book"));
         assertEquals(new CommandResult(
-                "Got it. I've added this task:\n"
+                "One deadline with an extra shot of urgency. Coming right up:\n"
                         + "   [D][ ] submit report (by: Dec 2 2019 1800)\n"
-                        + "Now you have 2 task(s) in the list.", false),
+                        + "You've got 2 item(s) brewing.", false),
                 alex.getResponse("deadline submit report /by 2019-12-02 1800"));
         assertEquals(new CommandResult(
-                "Got it. I've added this task:\n"
+                "All right, one reservation for your schedule:\n"
                         + "   [E][ ] meeting (from: Dec 3 2019 0900 to: Dec 3 2019 1000)\n"
-                        + "Now you have 3 task(s) in the list.", false),
+                        + "You've got 3 item(s) brewing.", false),
                 alex.getResponse("event meeting /from 2019-12-03 0900 /to 2019-12-03 1000"));
 
         Alex reloadedAlex = new Alex(dataFile.toString());
         assertEquals(new CommandResult(
-                "Here are the tasks in your list:\n"
+                "Let me check the order slip. Here's what you've got:\n"
                         + " 1.[T][ ] read book\n"
                         + " 2.[D][ ] submit report (by: Dec 2 2019 1800)\n"
                         + " 3.[E][ ] meeting (from: Dec 3 2019 0900 to: Dec 3 2019 1000)",
@@ -116,26 +118,27 @@ public class AlexTest {
         Alex alex = new Alex(dataFile.toString());
 
         assertEquals(new CommandResult(
-                "Nice! I've marked this task as done:\n   [T][X] second task", false),
+                "Done. One task served and off the counter:\n   [T][X] second task", false),
                 alex.getResponse("mark 2"));
         assertTrue(storage.loadTasks().get(1).isDone());
 
         Alex reloadedAfterMark = new Alex(dataFile.toString());
         assertEquals(new CommandResult(
-                "OK, I've marked this task as not done yet:\n   [T][ ] second task", false),
+                "Not finished? Fine. Back into the order queue it goes:\n"
+                        + "   [T][ ] second task", false),
                 reloadedAfterMark.getResponse("unmark 2"));
         assertFalse(storage.loadTasks().get(1).isDone());
 
         Alex reloadedAfterUnmark = new Alex(dataFile.toString());
         assertEquals(new CommandResult(
-                "Noted. I've removed this task:\n"
+                "Canceled. I'll toss the order slip:\n"
                         + "   [T][ ] second task\n"
-                        + "Now you have 2 task(s) in the list.", false),
+                        + "You've got 2 item(s) left brewing.", false),
                 reloadedAfterUnmark.getResponse("delete 2"));
 
         Alex reloadedAfterDelete = new Alex(dataFile.toString());
         assertEquals(new CommandResult(
-                "Here are the tasks in your list:\n"
+                "Let me check the order slip. Here's what you've got:\n"
                         + " 1.[T][ ] first task\n"
                         + " 2.[T][ ] third task", false),
                 reloadedAfterDelete.getResponse("list"));
@@ -149,11 +152,13 @@ public class AlexTest {
         Alex alex = new Alex(dataFile.toString());
 
         assertEquals(new CommandResult(
-                "Here are the matching tasks in your list:\n 1.[T][ ] read book", false),
+                "Found these tucked behind the espresso machine:\n 1.[T][ ] read book", false),
                 alex.getResponse("find book"));
-        assertEquals(new CommandResult("Bye. Hope to see you again soon!", false),
+        assertEquals(new CommandResult(
+                "All right, closing your tab. Try not to leave your tasks on the table.", false),
                 alex.getResponse("bye"));
-        assertEquals(new CommandResult("Sorry! I don't recognize that command.", true),
+        assertEquals(new CommandResult(
+                "That's not on the menu. Try 'list', 'todo', 'deadline', or 'event'.", true),
                 alex.getResponse("dance"));
     }
 
@@ -166,7 +171,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("list");
 
         assertEquals(new CommandResult(
-                "Sorry! The data file is invalid at line 1: unknown task type 'X'\n"
+                "The data file is invalid at line 1: unknown task type 'X'\n"
                         + "Please repair or remove the data file, then restart Alex.",
                 true), result);
     }
@@ -177,7 +182,8 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("   ");
 
-        assertEquals(new CommandResult("Sorry! Please enter a command.", true), result);
+        assertEquals(new CommandResult(
+                "You'll have to order something. I can't work with an empty cup.", true), result);
     }
 
     @Test
@@ -187,7 +193,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("list extra details");
 
         assertEquals(new CommandResult(
-                "Sorry! The 'list' command does not accept additional details.", true), result);
+                "The 'list' order comes as-is. No extras needed.", true), result);
     }
 
     @Test
@@ -197,7 +203,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("upcoming extra details");
 
         assertEquals(new CommandResult(
-                "Sorry! The 'upcoming' command does not accept additional details.", true), result);
+                "The 'upcoming' order comes as-is. No extras needed.", true), result);
     }
 
     @Test
@@ -207,7 +213,7 @@ public class AlexTest {
         CommandResult result = alex.getResponse("bye extra details");
 
         assertEquals(new CommandResult(
-                "Sorry! The 'bye' command does not accept additional details.", true), result);
+                "The 'bye' order comes as-is. No extras needed.", true), result);
     }
 
     @Test
@@ -216,8 +222,9 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("todo read book");
 
-        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
-        assertEquals(new CommandResult("Here are the tasks in your list:", false),
+        assertEquals(new CommandResult("Simulated save failure.", true), result);
+        assertEquals(new CommandResult(
+                "Let me check the order slip. Here's what you've got:", false),
                 alex.getResponse("list"));
     }
 
@@ -227,9 +234,9 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("mark 1");
 
-        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult("Simulated save failure.", true), result);
         assertEquals(new CommandResult(
-                "Here are the tasks in your list:\n 1.[T][ ] read book", false),
+                "Let me check the order slip. Here's what you've got:\n 1.[T][ ] read book", false),
                 alex.getResponse("list"));
     }
 
@@ -241,9 +248,9 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("unmark 1");
 
-        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult("Simulated save failure.", true), result);
         assertEquals(new CommandResult(
-                "Here are the tasks in your list:\n 1.[T][X] read book", false),
+                "Let me check the order slip. Here's what you've got:\n 1.[T][X] read book", false),
                 alex.getResponse("list"));
     }
 
@@ -256,9 +263,9 @@ public class AlexTest {
 
         CommandResult result = alex.getResponse("delete 2");
 
-        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult("Simulated save failure.", true), result);
         assertEquals(new CommandResult(
-                "Here are the tasks in your list:\n"
+                "Let me check the order slip. Here's what you've got:\n"
                         + " 1.[T][ ] first task\n"
                         + " 2.[T][ ] second task\n"
                         + " 3.[T][ ] third task", false),

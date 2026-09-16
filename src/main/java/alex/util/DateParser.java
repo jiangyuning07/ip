@@ -13,8 +13,8 @@ import alex.exception.AlexException;
  * Parses dates entered by users and formats dates for display.
  */
 public class DateParser {
-    private static final String DATE_TIME_ERROR_MESSAGE = "Please enter the date and optional time "
-            + "in yyyy-MM-dd [HHmm] format, for example 2019-12-02 1800.";
+    private static final String DATE_TIME_ERROR_MESSAGE = "I couldn't read that. Use yyyy-MM-dd "
+            + "and optionally HHmm, like 2026-09-20 1830.";
     private static final DateTimeFormatter DISPLAY_FORMAT =
             DateTimeFormatter.ofPattern("MMM d yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter
@@ -32,8 +32,8 @@ public class DateParser {
         try {
             return LocalDate.parse(input);
         } catch (DateTimeParseException e) {
-            throw new AlexException("Please enter the date in yyyy-MM-dd format, "
-                    + "for example 2019-12-02.");
+            throw new AlexException(
+                    "That date didn't scan. Use yyyy-MM-dd, like 2026-09-20.");
         }
     }
 

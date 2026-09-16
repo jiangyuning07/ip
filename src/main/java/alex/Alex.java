@@ -107,7 +107,7 @@ public class Alex {
      */
     public CommandResult getResponse(String input) {
         if (loadingErrorMessage != null) {
-            return CommandResult.error("Sorry! " + loadingErrorMessage
+            return CommandResult.error(loadingErrorMessage
                     + "\nPlease repair or remove the data file, then restart Alex.");
         }
 
@@ -117,7 +117,7 @@ public class Alex {
         try {
             return CommandResult.success(executeCommand(command, commandType));
         } catch (AlexException | StorageException e) {
-            return CommandResult.error("Sorry! " + e.getMessage());
+            return CommandResult.error(e.getMessage());
         }
     }
 
@@ -136,14 +136,15 @@ public class Alex {
                 : "Command type must match the command text";
 
         if (command.isBlank()) {
-            throw new AlexException("Please enter a command.");
+            throw new AlexException(
+                    "You'll have to order something. I can't work with an empty cup.");
         }
         if (commandType != CommandType.UNKNOWN && !commandType.canAcceptArguments()) {
             Parser.validateNoArguments(command, commandType);
         }
 
         return switch (commandType) {
-            case BYE -> "Bye. Hope to see you again soon!";
+            case BYE -> "All right, closing your tab. Try not to leave your tasks on the table.";
             case LIST -> getTaskListResponse();
             case UPCOMING -> getUpcomingDeadlinesResponse();
             case MARK -> markTask(command);
@@ -151,7 +152,8 @@ public class Alex {
             case DELETE -> deleteTask(command);
             case FIND -> findTasks(command);
             case TODO, DEADLINE, EVENT -> addTask(command, commandType);
-            case UNKNOWN -> throw new AlexException("I don't recognize that command.");
+            case UNKNOWN -> throw new AlexException(
+                    "That's not on the menu. Try 'list', 'todo', 'deadline', or 'event'.");
         };
     }
 
@@ -167,7 +169,7 @@ public class Alex {
             throw e;
         }
 
-        return "Nice! I've marked this task as done:\n"
+        return "Done. One task served and off the counter:\n"
                 + "   " + task;
     }
 
@@ -183,7 +185,7 @@ public class Alex {
             throw e;
         }
 
-        return "OK, I've marked this task as not done yet:\n"
+        return "Not finished? Fine. Back into the order queue it goes:\n"
                 + "   " + task;
     }
 
@@ -197,22 +199,22 @@ public class Alex {
             throw e;
         }
 
-        return "Noted. I've removed this task:\n"
+        return "Canceled. I'll toss the order slip:\n"
                 + "   " + removedTask + "\n"
-                + "Now you have " + tasks.getSize() + " task(s) in the list.";
+                + "You've got " + tasks.getSize() + " item(s) left brewing.";
     }
 
     private String getTaskListResponse() {
-        return formatTasks("Here are the tasks in your list:", tasks.getTasks());
+        return formatTasks("Let me check the order slip. Here's what you've got:", tasks.getTasks());
     }
 
     private String getUpcomingDeadlinesResponse() {
         List<Task> upcomingDeadlines = tasks.findUpcomingDeadlines(LocalDateTime.now(clock));
         if (upcomingDeadlines.isEmpty()) {
-            return "You have no incomplete deadlines due in the next 24 hours.";
+            return "Nothing due in the next 24 hours. Slow shift, apparently.";
         }
         return formatTasks(
-                "Here are your incomplete deadlines due in the next 24 hours:",
+                "These are due in the next 24 hours. They're starting to steam:",
                 upcomingDeadlines);
     }
 
@@ -220,9 +222,10 @@ public class Alex {
         String keyword = Parser.parseFindKeyword(command);
         List<Task> matchingTasks = tasks.find(keyword);
         if (matchingTasks.isEmpty()) {
-            throw new AlexException("No matches found.");
+            throw new AlexException("Nothing matching '" + keyword
+                    + "'. Maybe it ordered under a different name.");
         }
-        return formatTasks("Here are the matching tasks in your list:", matchingTasks);
+        return formatTasks("Found these tucked behind the espresso machine:", matchingTasks);
     }
 
     private static String formatTasks(String heading, List<Task> tasksToFormat) {
@@ -254,9 +257,16 @@ public class Alex {
             throw e;
         }
 
-        return "Got it. I've added this task:\n"
+        String acknowledgement = switch (commandType) {
+            case TODO -> "One task, house blend. Added to your order:";
+            case DEADLINE -> "One deadline with an extra shot of urgency. Coming right up:";
+            case EVENT -> "All right, one reservation for your schedule:";
+            default -> throw new AssertionError("Unsupported task-creation command");
+        };
+
+        return acknowledgement + "\n"
                 + "   " + task + "\n"
-                + "Now you have " + tasks.getSize() + " task(s) in the list.";
+                + "You've got " + tasks.getSize() + " item(s) brewing.";
     }
 
     private void saveTasks() throws StorageException {

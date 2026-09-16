@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
  */
 public class MainWindow {
     private static final String WELCOME_MESSAGE =
-            "Hello! I'm Alex.\nWhat can I do for you?";
+            "Hey. Welcome to Alex's.\nWhat can I get started for you?";
 
     private final Image alexImage = new Image(
             getClass().getResourceAsStream("/images/DaAlex.png"));
