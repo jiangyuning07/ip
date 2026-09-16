@@ -135,6 +135,13 @@ public class Alex {
         assert commandType == Parser.parseCommandType(command)
                 : "Command type must match the command text";
 
+        if (command.isBlank()) {
+            throw new AlexException("Please enter a command.");
+        }
+        if (commandType != CommandType.UNKNOWN && !commandType.canAcceptArguments()) {
+            Parser.validateNoArguments(command, commandType);
+        }
+
         return switch (commandType) {
             case BYE -> "Bye. Hope to see you again soon!";
             case LIST -> getTaskListResponse();

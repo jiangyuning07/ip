@@ -42,6 +42,15 @@ public enum CommandType {
     }
 
     /**
+     * Returns whether this command type accepts arguments.
+     *
+     * @return whether arguments are allowed after the command keyword.
+     */
+    public boolean canAcceptArguments() {
+        return canAcceptArguments;
+    }
+
+    /**
      * Identifies the type of a user command.
      *
      * @param command full user command.
@@ -51,7 +60,7 @@ public enum CommandType {
         return Arrays.stream(values())
                 .filter(type -> type != UNKNOWN)
                 .filter(type -> command.equals(type.keyword)
-                        || (type.canAcceptArguments && command.startsWith(type.keyword + " ")))
+                        || command.startsWith(type.keyword + " "))
                 .findFirst()
                 .orElse(UNKNOWN);
     }

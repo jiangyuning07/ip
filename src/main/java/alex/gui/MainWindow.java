@@ -52,19 +52,18 @@ public class MainWindow {
     private void handleUserInput() {
         String input = userInput.getText().trim();
 
-        if (input.isEmpty()) {
-            userInput.clear();
-            return;
-        }
-
         CommandResult result = alex.getResponse(input);
         DialogBox responseDialog = result.isError()
                 ? DialogBox.getErrorDialog(result.text(), alexImage)
                 : DialogBox.getAlexDialog(result.text(), alexImage);
 
-        dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input),
-                responseDialog);
+        if (input.isEmpty()) {
+            dialogContainer.getChildren().add(responseDialog);
+        } else {
+            dialogContainer.getChildren().addAll(
+                    DialogBox.getUserDialog(input),
+                    responseDialog);
+        }
 
         userInput.clear();
         userInput.requestFocus();

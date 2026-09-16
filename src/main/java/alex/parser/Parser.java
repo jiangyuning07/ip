@@ -27,6 +27,26 @@ public class Parser {
     }
 
     /**
+     * Ensures that a command which takes no arguments has no additional details.
+     *
+     * @param command full user command.
+     * @param commandType command whose arguments are being validated.
+     * @throws AlexException if additional details follow the command keyword.
+     */
+    public static void validateNoArguments(String command, CommandType commandType)
+            throws AlexException {
+        assert commandType != CommandType.UNKNOWN && !commandType.canAcceptArguments()
+                : "Command type must be a known command that rejects arguments";
+        assert CommandType.parse(command) == commandType
+                : "Command type must match the command text";
+
+        if (!getArguments(command, commandType).isEmpty()) {
+            throw new AlexException("The '" + commandType.getKeyword()
+                    + "' command does not accept additional details.");
+        }
+    }
+
+    /**
      * Extracts and validates the one-based task number in a command.
      *
      * @param command full user command.

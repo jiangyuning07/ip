@@ -23,6 +23,11 @@ public class ParserTest {
     }
 
     @Test
+    public void parseCommandType_listCommandWithDetails_returnsList() {
+        assertEquals(CommandType.LIST, Parser.parseCommandType("list extra details"));
+    }
+
+    @Test
     public void parseTaskIndex_firstTask_returnsZero() throws AlexException {
         assertEquals(0, Parser.parseTaskIndex("delete 1", CommandType.DELETE, 3));
     }

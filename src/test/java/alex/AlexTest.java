@@ -71,6 +71,45 @@ public class AlexTest {
     }
 
     @Test
+    public void getResponse_blankCommand_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("   ");
+
+        assertEquals(new CommandResult("Sorry! Please enter a command.", true), result);
+    }
+
+    @Test
+    public void getResponse_listCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("list extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'list' command does not accept additional details.", true), result);
+    }
+
+    @Test
+    public void getResponse_upcomingCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("upcoming extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'upcoming' command does not accept additional details.", true), result);
+    }
+
+    @Test
+    public void getResponse_byeCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("bye extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'bye' command does not accept additional details.", true), result);
+    }
+
+    @Test
     public void getResponse_addWhenSaveFails_doesNotAddTask() {
         Alex alex = createAlexWithSaveFailure(List.of());
 
