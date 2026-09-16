@@ -117,4 +117,31 @@ public class ParserTest {
         assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
                 + "for example 2019-12-02 1800.", exception.getMessage());
     }
+
+    @Test
+    public void parseTask_todoDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask("todo compare A | B", CommandType.TODO));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_deadlineDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "deadline compare A | B /by 2019-12-02", CommandType.DEADLINE));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event compare A | B /from 2019-12-02 /to 2019-12-03",
+                        CommandType.EVENT));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
 }

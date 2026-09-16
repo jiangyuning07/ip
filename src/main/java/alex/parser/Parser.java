@@ -114,6 +114,7 @@ public class Parser {
         if (description.isEmpty()) {
             throw new AlexException("A todo needs a description.");
         }
+        validateDescriptionCharacters(description);
         return new Todo(description);
     }
 
@@ -132,6 +133,7 @@ public class Parser {
         if (description.isEmpty()) {
             throw new AlexException("The deadline description cannot be empty.");
         }
+        validateDescriptionCharacters(description);
         if (dueDateText.isEmpty()) {
             throw new AlexException("The deadline date cannot be empty.");
         }
@@ -164,6 +166,7 @@ public class Parser {
         if (description.isEmpty()) {
             throw new AlexException("The event description cannot be empty.");
         }
+        validateDescriptionCharacters(description);
         if (startDateText.isEmpty()) {
             throw new AlexException("The event start date cannot be empty.");
         }
@@ -174,6 +177,12 @@ public class Parser {
         TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
         TaskDateTime endDateTime = DateParser.parseTaskDateTime(endDateText);
         return new Event(description, startDateTime, endDateTime);
+    }
+
+    private static void validateDescriptionCharacters(String description) throws AlexException {
+        if (description.contains("|")) {
+            throw new AlexException("Task descriptions cannot contain '|'.");
+        }
     }
 
     private static String getArguments(String command, CommandType commandType) {
