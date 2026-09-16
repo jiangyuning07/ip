@@ -49,7 +49,8 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTaskIndex("delete", CommandType.DELETE, 3));
 
-        assertEquals("Please provide a task number after 'delete'.", exception.getMessage());
+        assertEquals("Which order number? Put a task number after 'delete'.",
+                exception.getMessage());
     }
 
     @Test
@@ -57,7 +58,8 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTaskIndex("delete two", CommandType.DELETE, 3));
 
-        assertEquals("'two' is not a valid task number.", exception.getMessage());
+        assertEquals("'two' isn't an order number. I need an actual number here.",
+                exception.getMessage());
     }
 
     @Test
@@ -65,7 +67,8 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTaskIndex("delete 0", CommandType.DELETE, 3));
 
-        assertEquals("Please choose a task number from 1 to 3.", exception.getMessage());
+        assertEquals("Order numbers run from 1 to 3. Pick one from the display case.",
+                exception.getMessage());
     }
 
     @Test
@@ -73,7 +76,8 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTaskIndex("delete 4", CommandType.DELETE, 3));
 
-        assertEquals("Please choose a task number from 1 to 3.", exception.getMessage());
+        assertEquals("Order numbers run from 1 to 3. Pick one from the display case.",
+                exception.getMessage());
     }
 
     @Test
@@ -81,7 +85,7 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTaskIndex("delete 1", CommandType.DELETE, 0));
 
-        assertEquals("There are no tasks in the list yet.", exception.getMessage());
+        assertEquals("There isn't anything on the order yet.", exception.getMessage());
     }
 
     @Test
@@ -94,29 +98,33 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseFindKeyword("find"));
 
-        assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
+        assertEquals("What am I looking for? Give me a keyword after 'find'.",
+                exception.getMessage());
     }
 
     @Test
     public void parseTask_missingRequiredDetails_throwsSpecificExceptions() {
         List<InvalidTaskCommand> invalidCommands = List.of(
                 new InvalidTaskCommand(
-                        "todo", CommandType.TODO, "A todo needs a description."),
+                        "todo", CommandType.TODO,
+                        "One todo with no description? That's basically an empty cup."),
                 new InvalidTaskCommand(
                         "deadline /by 2019-12-02", CommandType.DEADLINE,
-                        "The deadline description cannot be empty."),
+                        "I have the due date, but not what you're ordering. "
+                                + "Add a description before '/by'."),
                 new InvalidTaskCommand(
                         "deadline submit report /by", CommandType.DEADLINE,
-                        "The deadline date cannot be empty."),
+                        "You forgot the due date. Add one after '/by' so I know when to serve it."),
                 new InvalidTaskCommand(
                         "event /from 2019-12-02 /to 2019-12-03", CommandType.EVENT,
-                        "The event description cannot be empty."),
+                        "I have the booking time, but no idea what it's for. "
+                                + "Add a description first."),
                 new InvalidTaskCommand(
                         "event meeting /from /to 2019-12-03", CommandType.EVENT,
-                        "The event start date cannot be empty."),
+                        "When does this start? Add a date after '/from'."),
                 new InvalidTaskCommand(
                         "event meeting /from 2019-12-02 /to", CommandType.EVENT,
-                        "The event end date cannot be empty."));
+                        "When does this end? Add a date after '/to'."));
 
         for (InvalidTaskCommand invalidCommand : invalidCommands) {
             assertTaskParsingFails(
@@ -139,7 +147,7 @@ public class ParserTest {
                         "deadline report /by 2019-12-02 /by 2019-12-03",
                         CommandType.DEADLINE));
 
-        assertEquals("A deadline must contain exactly one standalone /by delimiter.",
+        assertEquals("A deadline needs one '/by' before its due date. House rule.",
                 exception.getMessage());
     }
 
@@ -158,7 +166,7 @@ public class ParserTest {
                 Parser.parseTask(
                         "deadline review /bypass logic 2019-12-02", CommandType.DEADLINE));
 
-        assertEquals("A deadline must contain exactly one standalone /by delimiter.",
+        assertEquals("A deadline needs one '/by' before its due date. House rule.",
                 exception.getMessage());
     }
 
@@ -169,7 +177,8 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
                         CommandType.EVENT));
 
-        assertEquals("The event end must be after its start.", exception.getMessage());
+        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+                exception.getMessage());
     }
 
     @Test
@@ -179,7 +188,8 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 1800 /to 2019-12-02 1800",
                         CommandType.EVENT));
 
-        assertEquals("The event end must be after its start.", exception.getMessage());
+        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+                exception.getMessage());
     }
 
     @Test
@@ -189,7 +199,8 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 /to 2019-12-02",
                         CommandType.EVENT));
 
-        assertEquals("The event end must be after its start.", exception.getMessage());
+        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+                exception.getMessage());
     }
 
     @Test
@@ -209,7 +220,7 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 /from 2019-12-03 /to 2019-12-04",
                         CommandType.EVENT));
 
-        assertEquals("An event must contain exactly one standalone /from delimiter.",
+        assertEquals("An event needs exactly one '/from'. One starting time is usually enough.",
                 exception.getMessage());
     }
 
@@ -219,7 +230,7 @@ public class ParserTest {
                 Parser.parseTask(
                         "event meeting /to 2019-12-03", CommandType.EVENT));
 
-        assertEquals("An event must contain exactly one standalone /from delimiter.",
+        assertEquals("An event needs exactly one '/from'. One starting time is usually enough.",
                 exception.getMessage());
     }
 
@@ -230,7 +241,7 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 /to 2019-12-03 /to 2019-12-04",
                         CommandType.EVENT));
 
-        assertEquals("An event must contain exactly one standalone /to delimiter.",
+        assertEquals("An event needs exactly one '/to'. Let's not keep the table indefinitely.",
                 exception.getMessage());
     }
 
@@ -240,7 +251,7 @@ public class ParserTest {
                 Parser.parseTask(
                         "event meeting /from 2019-12-02", CommandType.EVENT));
 
-        assertEquals("An event must contain exactly one standalone /to delimiter.",
+        assertEquals("An event needs exactly one '/to'. Let's not keep the table indefinitely.",
                 exception.getMessage());
     }
 
@@ -251,7 +262,7 @@ public class ParserTest {
                         "event meeting /to 2019-12-03 /from 2019-12-02",
                         CommandType.EVENT));
 
-        assertEquals("An event's /from delimiter must appear before its /to delimiter.",
+        assertEquals("Put '/from' before '/to'. Time still works that way here.",
                 exception.getMessage());
     }
 
@@ -268,8 +279,8 @@ public class ParserTest {
 
     @Test
     public void parseTask_deadlineWithInvalidDateTimes_exceptionThrown() {
-        String expectedMessage = "Please enter the date and optional time in yyyy-MM-dd [HHmm] "
-                + "format, for example 2019-12-02 1800.";
+        String expectedMessage = "I couldn't read that. Use yyyy-MM-dd and optionally HHmm, "
+                + "like 2026-09-20 1830.";
 
         List<String> invalidCommands = List.of(
                 "deadline submit report /by 2019-12-02 2460",
@@ -285,7 +296,8 @@ public class ParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTask("todo compare A | B", CommandType.TODO));
 
-        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+        assertEquals("Task descriptions can't contain '|'. House rule, apparently.",
+                exception.getMessage());
     }
 
     @Test
@@ -294,7 +306,8 @@ public class ParserTest {
                 Parser.parseTask(
                         "deadline compare A | B /by 2019-12-02", CommandType.DEADLINE));
 
-        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+        assertEquals("Task descriptions can't contain '|'. House rule, apparently.",
+                exception.getMessage());
     }
 
     @Test
@@ -304,7 +317,8 @@ public class ParserTest {
                         "event compare A | B /from 2019-12-02 /to 2019-12-03",
                         CommandType.EVENT));
 
-        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+        assertEquals("Task descriptions can't contain '|'. House rule, apparently.",
+                exception.getMessage());
     }
 
     private static void assertTaskParsingFails(

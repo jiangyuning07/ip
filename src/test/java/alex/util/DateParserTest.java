@@ -37,8 +37,7 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parse("28-08-2026"));
 
-        assertEquals("Please enter the date in yyyy-MM-dd format, "
-                + "for example 2019-12-02.",
+        assertEquals("That date didn't scan. Use yyyy-MM-dd, like 2026-09-20.",
                 exception.getMessage());
     }
 
@@ -47,8 +46,7 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parse("2026-02-30"));
 
-        assertEquals("Please enter the date in yyyy-MM-dd format, "
-                + "for example 2019-12-02.",
+        assertEquals("That date didn't scan. Use yyyy-MM-dd, like 2026-09-20.",
                 exception.getMessage());
     }
 
@@ -57,8 +55,7 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parse("2025-02-29"));
 
-        assertEquals("Please enter the date in yyyy-MM-dd format, "
-                + "for example 2019-12-02.",
+        assertEquals("That date didn't scan. Use yyyy-MM-dd, like 2026-09-20.",
                 exception.getMessage());
     }
 
@@ -67,8 +64,7 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parse(""));
 
-        assertEquals("Please enter the date in yyyy-MM-dd format, "
-                + "for example 2019-12-02.",
+        assertEquals("That date didn't scan. Use yyyy-MM-dd, like 2026-09-20.",
                 exception.getMessage());
     }
 
@@ -96,8 +92,8 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parseTaskDateTime("2019-02-29 1800"));
 
-        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
-                + "for example 2019-12-02 1800.", exception.getMessage());
+        assertEquals("I couldn't read that. Use yyyy-MM-dd and optionally HHmm, "
+                + "like 2026-09-20 1830.", exception.getMessage());
     }
 
     @Test
@@ -105,7 +101,7 @@ public class DateParserTest {
         AlexException exception = assertThrows(AlexException.class, () ->
                 DateParser.parseTaskDateTime("2019-12-02 2400"));
 
-        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
-                + "for example 2019-12-02 1800.", exception.getMessage());
+        assertEquals("I couldn't read that. Use yyyy-MM-dd and optionally HHmm, "
+                + "like 2026-09-20 1830.", exception.getMessage());
     }
 }

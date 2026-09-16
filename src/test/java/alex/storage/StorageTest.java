@@ -89,7 +89,8 @@ public class StorageTest {
         StorageException exception = assertThrows(StorageException.class, storage::loadTasks);
 
         assertEquals("The data file is invalid at line 1: "
-                + "The event end must be after its start.", exception.getMessage());
+                + "The event ends before it starts. We serve coffee, not temporal paradoxes.",
+                exception.getMessage());
     }
 
     private void assertInvalidTaskData(InvalidTaskData invalidTask) throws IOException {

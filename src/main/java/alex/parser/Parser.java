@@ -53,7 +53,7 @@ public class Parser {
 
         if (!getArguments(command, commandType).isEmpty()) {
             throw new AlexException("The '" + commandType.getKeyword()
-                    + "' command does not accept additional details.");
+                    + "' order comes as-is. No extras needed.");
         }
     }
 
@@ -80,21 +80,24 @@ public class Parser {
         String taskNumberText = command.substring(commandName.length()).trim();
 
         if (taskNumberText.isEmpty()) {
-            throw new AlexException("Please provide a task number after '" + commandName + "'.");
+            throw new AlexException(
+                    "Which order number? Put a task number after '" + commandName + "'.");
         }
 
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(taskNumberText);
         } catch (NumberFormatException e) {
-            throw new AlexException("'" + taskNumberText + "' is not a valid task number.");
+            throw new AlexException("'" + taskNumberText
+                    + "' isn't an order number. I need an actual number here.");
         }
 
         if (taskNumber < 1 || taskNumber > taskCount) {
             if (taskCount == 0) {
-                throw new AlexException("There are no tasks in the list yet.");
+                throw new AlexException("There isn't anything on the order yet.");
             }
-            throw new AlexException("Please choose a task number from 1 to " + taskCount + ".");
+            throw new AlexException("Order numbers run from 1 to " + taskCount
+                    + ". Pick one from the display case.");
         }
 
         int taskIndex = taskNumber - 1;
@@ -113,7 +116,8 @@ public class Parser {
     public static String parseFindKeyword(String command) throws AlexException {
         String keyword = getArguments(command, CommandType.FIND);
         if (keyword.isEmpty()) {
-            throw new AlexException("Please provide a keyword after 'find'.");
+            throw new AlexException(
+                    "What am I looking for? Give me a keyword after 'find'.");
         }
         return keyword;
     }
@@ -143,7 +147,8 @@ public class Parser {
     private static Task parseTodo(String command) throws AlexException {
         String description = getArguments(command, CommandType.TODO);
         if (description.isEmpty()) {
-            throw new AlexException("A todo needs a description.");
+            throw new AlexException(
+                    "One todo with no description? That's basically an empty cup.");
         }
         validateDescriptionCharacters(description);
         return new Todo(description);
@@ -155,8 +160,8 @@ public class Parser {
                 details, DEADLINE_DATE_MARKER_PATTERN);
 
         if (dueDateSeparators.size() != 1) {
-            throw new AlexException("A deadline must contain exactly one standalone "
-                    + DEADLINE_DATE_MARKER + " delimiter.");
+            throw new AlexException(
+                    "A deadline needs one '" + DEADLINE_DATE_MARKER + "' before its due date. House rule.");
         }
 
         int dueDateSeparator = dueDateSeparators.get(0);
@@ -164,11 +169,13 @@ public class Parser {
         String dueDateText = details.substring(
                 dueDateSeparator + DEADLINE_DATE_MARKER.length()).trim();
         if (description.isEmpty()) {
-            throw new AlexException("The deadline description cannot be empty.");
+            throw new AlexException("I have the due date, but not what you're ordering. "
+                    + "Add a description before '/by'.");
         }
         validateDescriptionCharacters(description);
         if (dueDateText.isEmpty()) {
-            throw new AlexException("The deadline date cannot be empty.");
+            throw new AlexException(
+                    "You forgot the due date. Add one after '/by' so I know when to serve it.");
         }
 
         TaskDateTime dueDateTime = DateParser.parseTaskDateTime(dueDateText);
@@ -183,19 +190,19 @@ public class Parser {
                 details, EVENT_END_DATE_MARKER_PATTERN);
 
         if (startDateSeparators.size() != 1) {
-            throw new AlexException("An event must contain exactly one standalone "
-                    + EVENT_START_DATE_MARKER + " delimiter.");
+            throw new AlexException(
+                    "An event needs exactly one '/from'. One starting time is usually enough.");
         }
         if (endDateSeparators.size() != 1) {
-            throw new AlexException("An event must contain exactly one standalone "
-                    + EVENT_END_DATE_MARKER + " delimiter.");
+            throw new AlexException(
+                    "An event needs exactly one '/to'. Let's not keep the table indefinitely.");
         }
 
         int startDateSeparator = startDateSeparators.get(0);
         int endDateSeparator = endDateSeparators.get(0);
         if (startDateSeparator >= endDateSeparator) {
-            throw new AlexException("An event's " + EVENT_START_DATE_MARKER
-                    + " delimiter must appear before its " + EVENT_END_DATE_MARKER + " delimiter.");
+            throw new AlexException(
+                    "Put '/from' before '/to'. Time still works that way here.");
         }
 
         String description = details.substring(0, startDateSeparator).trim();
@@ -204,14 +211,15 @@ public class Parser {
         String endDateText = details.substring(
                 endDateSeparator + EVENT_END_DATE_MARKER.length()).trim();
         if (description.isEmpty()) {
-            throw new AlexException("The event description cannot be empty.");
+            throw new AlexException("I have the booking time, but no idea what it's for. "
+                    + "Add a description first.");
         }
         validateDescriptionCharacters(description);
         if (startDateText.isEmpty()) {
-            throw new AlexException("The event start date cannot be empty.");
+            throw new AlexException("When does this start? Add a date after '/from'.");
         }
         if (endDateText.isEmpty()) {
-            throw new AlexException("The event end date cannot be empty.");
+            throw new AlexException("When does this end? Add a date after '/to'.");
         }
 
         TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
@@ -225,7 +233,7 @@ public class Parser {
 
     private static void validateDescriptionCharacters(String description) throws AlexException {
         if (description.contains("|")) {
-            throw new AlexException("Task descriptions cannot contain '|'.");
+            throw new AlexException("Task descriptions can't contain '|'. House rule, apparently.");
         }
     }
 
