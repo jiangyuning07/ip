@@ -99,12 +99,42 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTask_eventStartAfterEnd_returnsTimedEvent() throws AlexException {
+    public void parseTask_eventEndsBeforeStart_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventEndEqualsStart_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 1800 /to 2019-12-02 1800",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventDatesAreEqual_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 /to 2019-12-02",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventEndsAfterStart_returnsTimedEvent() throws AlexException {
         Task task = Parser.parseTask(
-                "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
+                "event meeting /from 2019-12-02 1700 /to 2019-12-02 1800",
                 CommandType.EVENT);
 
-        assertEquals("E | 0 | meeting | 2019-12-02 1800 | 2019-12-02 1700",
+        assertEquals("E | 0 | meeting | 2019-12-02 1700 | 2019-12-02 1800",
                 task.toDataString());
     }
 

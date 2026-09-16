@@ -176,7 +176,11 @@ public class Parser {
 
         TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
         TaskDateTime endDateTime = DateParser.parseTaskDateTime(endDateText);
-        return new Event(description, startDateTime, endDateTime);
+        try {
+            return new Event(description, startDateTime, endDateTime);
+        } catch (IllegalArgumentException e) {
+            throw new AlexException(e.getMessage());
+        }
     }
 
     private static void validateDescriptionCharacters(String description) throws AlexException {
