@@ -1,13 +1,12 @@
 package alex.parser;
 
-import java.time.LocalDate;
-
 import alex.exception.AlexException;
 import alex.task.Deadline;
 import alex.task.Event;
 import alex.task.Task;
 import alex.task.Todo;
 import alex.util.DateParser;
+import alex.util.TaskDateTime;
 
 /**
  * Interprets user commands and converts their arguments into domain objects.
@@ -137,8 +136,8 @@ public class Parser {
             throw new AlexException("The deadline date cannot be empty.");
         }
 
-        LocalDate dueDate = DateParser.parse(dueDateText);
-        return new Deadline(description, dueDate);
+        TaskDateTime dueDateTime = DateParser.parseTaskDateTime(dueDateText);
+        return new Deadline(description, dueDateTime);
     }
 
     private static Task parseEvent(String command) throws AlexException {
@@ -172,9 +171,9 @@ public class Parser {
             throw new AlexException("The event end date cannot be empty.");
         }
 
-        LocalDate startDate = DateParser.parse(startDateText);
-        LocalDate endDate = DateParser.parse(endDateText);
-        return new Event(description, startDate, endDate);
+        TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
+        TaskDateTime endDateTime = DateParser.parseTaskDateTime(endDateText);
+        return new Event(description, startDateTime, endDateTime);
     }
 
     private static String getArguments(String command, CommandType commandType) {

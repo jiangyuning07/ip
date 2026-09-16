@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import alex.exception.AlexException;
+import alex.task.Task;
 
 /**
  * Tests command parsing behavior.
@@ -82,5 +83,33 @@ public class ParserTest {
                 Parser.parseFindKeyword("find"));
 
         assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_deadlineWithTime_returnsTimedDeadline() throws AlexException {
+        Task task = Parser.parseTask(
+                "deadline submit report /by 2019-12-02 1800", CommandType.DEADLINE);
+
+        assertEquals("D | 0 | submit report | 2019-12-02 1800", task.toDataString());
+    }
+
+    @Test
+    public void parseTask_eventStartAfterEnd_returnsTimedEvent() throws AlexException {
+        Task task = Parser.parseTask(
+                "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
+                CommandType.EVENT);
+
+        assertEquals("E | 0 | meeting | 2019-12-02 1800 | 2019-12-02 1700",
+                task.toDataString());
+    }
+
+    @Test
+    public void parseTask_deadlineWithImpossibleTime_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "deadline submit report /by 2019-12-02 2460", CommandType.DEADLINE));
+
+        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
+                + "for example 2019-12-02 1800.", exception.getMessage());
     }
 }

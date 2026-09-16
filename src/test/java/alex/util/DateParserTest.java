@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -69,5 +70,42 @@ public class DateParserTest {
         assertEquals("Please enter the date in yyyy-MM-dd format, "
                 + "for example 2019-12-02.",
                 exception.getMessage());
+    }
+
+    @Test
+    public void parseTaskDateTime_dateWithoutTime_returnsDateOnly() throws AlexException {
+        TaskDateTime expectedDateTime = new TaskDateTime(LocalDate.of(2019, 12, 2));
+
+        TaskDateTime actualDateTime = DateParser.parseTaskDateTime("2019-12-02");
+
+        assertEquals(expectedDateTime, actualDateTime);
+    }
+
+    @Test
+    public void parseTaskDateTime_dateWithTime_returnsDateAndTime() throws AlexException {
+        TaskDateTime expectedDateTime = new TaskDateTime(
+                LocalDate.of(2019, 12, 2), LocalTime.of(18, 0));
+
+        TaskDateTime actualDateTime = DateParser.parseTaskDateTime("2019-12-02 1800");
+
+        assertEquals(expectedDateTime, actualDateTime);
+    }
+
+    @Test
+    public void parseTaskDateTime_impossibleDate_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parseTaskDateTime("2019-02-29 1800"));
+
+        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
+                + "for example 2019-12-02 1800.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTaskDateTime_impossibleTime_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                DateParser.parseTaskDateTime("2019-12-02 2400"));
+
+        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
+                + "for example 2019-12-02 1800.", exception.getMessage());
     }
 }

@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import alex.exception.AlexException;
 import alex.task.Deadline;
 import alex.task.Event;
 import alex.task.Task;
 import alex.task.Todo;
+import alex.util.DateParser;
 
 /**
  * Loads and saves Alex's task list using a local data file.
@@ -105,7 +106,7 @@ public class Storage {
                 task.markAsDone();
             }
             return task;
-        } catch (IllegalArgumentException e) {
+        } catch (AlexException | IllegalArgumentException e) {
             throw new StorageException("The data file is invalid at line " + lineNumber
                     + ": " + e.getMessage(), e);
         }
@@ -117,7 +118,7 @@ public class Storage {
      * @param fields fields read from one line in the data file.
      * @return the reconstructed task.
      */
-    private Task createTask(String[] fields) {
+    private Task createTask(String[] fields) throws AlexException {
         if (fields.length < FIELD_COUNT_REQUIRED_HEADER) {
             throw new IllegalArgumentException("missing task type or completion status");
         }
@@ -136,12 +137,12 @@ public class Storage {
             case TASK_TYPE_DEADLINE:
                 validateFields(fields, FIELD_COUNT_DEADLINE);
                 return new Deadline(fields[FIELD_INDEX_FIRST_DETAIL],
-                        LocalDate.parse(fields[FIELD_INDEX_DEADLINE_DATE]));
+                        DateParser.parseTaskDateTime(fields[FIELD_INDEX_DEADLINE_DATE]));
             case TASK_TYPE_EVENT:
                 validateFields(fields, FIELD_COUNT_EVENT);
                 return new Event(fields[FIELD_INDEX_FIRST_DETAIL],
-                        LocalDate.parse(fields[FIELD_INDEX_EVENT_START_DATE]),
-                        LocalDate.parse(fields[FIELD_INDEX_EVENT_END_DATE]));
+                        DateParser.parseTaskDateTime(fields[FIELD_INDEX_EVENT_START_DATE]),
+                        DateParser.parseTaskDateTime(fields[FIELD_INDEX_EVENT_END_DATE]));
             default:
                 throw new IllegalArgumentException("unknown task type '" + taskType + "'");
         }

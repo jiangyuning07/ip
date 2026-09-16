@@ -3,13 +3,14 @@ package alex.task;
 import java.time.LocalDate;
 
 import alex.util.DateParser;
+import alex.util.TaskDateTime;
 
 /**
  * Represents a task that occurs over a date range.
  */
 public class Event extends Task {
-    private final LocalDate startDate;
-    private final LocalDate endDate;
+    private final TaskDateTime startDateTime;
+    private final TaskDateTime endDateTime;
 
     /**
      * Creates an event with a description and date range.
@@ -19,12 +20,23 @@ public class Event extends Task {
      * @param endDate event end date.
      */
     public Event(String description, LocalDate startDate, LocalDate endDate) {
-        super(description);
-        assert startDate != null : "Event start date cannot be null";
-        assert endDate != null : "Event end date cannot be null";
+        this(description, new TaskDateTime(startDate), new TaskDateTime(endDate));
+    }
 
-        this.startDate = startDate;
-        this.endDate = endDate;
+    /**
+     * Creates an event with a description and date range containing optional times.
+     *
+     * @param description description of the event.
+     * @param startDateTime event start date and optional time.
+     * @param endDateTime event end date and optional time.
+     */
+    public Event(String description, TaskDateTime startDateTime, TaskDateTime endDateTime) {
+        super(description);
+        assert startDateTime != null : "Event start date and time cannot be null";
+        assert endDateTime != null : "Event end date and time cannot be null";
+
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
     }
 
     /**
@@ -33,7 +45,8 @@ public class Event extends Task {
     @Override
     public String toDataString() {
         return "E | " + getDoneFlag() + " | " + getDescription()
-                + " | " + startDate + " | " + endDate;
+                + " | " + DateParser.formatForStorage(startDateTime)
+                + " | " + DateParser.formatForStorage(endDateTime);
     }
 
     /**
@@ -42,7 +55,7 @@ public class Event extends Task {
     @Override
     public String toString() {
         return "[E]" + super.toString()
-                + " (from: " + DateParser.format(startDate)
-                + " to: " + DateParser.format(endDate) + ")";
+                + " (from: " + DateParser.format(startDateTime)
+                + " to: " + DateParser.format(endDateTime) + ")";
     }
 }
