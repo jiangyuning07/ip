@@ -1,6 +1,7 @@
 package alex.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,6 +71,19 @@ public class TaskListTest {
                         currentDateTime.toLocalDate().plusDays(1)));
 
         assertEquals(List.of(), tasks.findUpcomingDeadlines(currentDateTime));
+    }
+
+    @Test
+    public void getTasks_returnedList_isUnmodifiableSnapshot() {
+        Task firstTask = new Todo("first task");
+        Task secondTask = new Todo("second task");
+        TaskList tasks = new TaskList(firstTask);
+
+        List<Task> snapshot = tasks.getTasks();
+        tasks.add(secondTask);
+
+        assertEquals(List.of(firstTask), snapshot);
+        assertThrows(UnsupportedOperationException.class, () -> snapshot.add(secondTask));
     }
 
     private static Deadline createTimedDeadline(String description, LocalDateTime dueDateTime) {

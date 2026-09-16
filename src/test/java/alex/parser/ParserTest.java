@@ -3,6 +3,8 @@ package alex.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import alex.exception.AlexException;
@@ -93,6 +95,33 @@ public class ParserTest {
                 Parser.parseFindKeyword("find"));
 
         assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_missingRequiredDetails_throwsSpecificExceptions() {
+        List<InvalidTaskCommand> invalidCommands = List.of(
+                new InvalidTaskCommand(
+                        "todo", CommandType.TODO, "A todo needs a description."),
+                new InvalidTaskCommand(
+                        "deadline /by 2019-12-02", CommandType.DEADLINE,
+                        "The deadline description cannot be empty."),
+                new InvalidTaskCommand(
+                        "deadline submit report /by", CommandType.DEADLINE,
+                        "The deadline date cannot be empty."),
+                new InvalidTaskCommand(
+                        "event /from 2019-12-02 /to 2019-12-03", CommandType.EVENT,
+                        "The event description cannot be empty."),
+                new InvalidTaskCommand(
+                        "event meeting /from /to 2019-12-03", CommandType.EVENT,
+                        "The event start date cannot be empty."),
+                new InvalidTaskCommand(
+                        "event meeting /from 2019-12-02 /to", CommandType.EVENT,
+                        "The event end date cannot be empty."));
+
+        for (InvalidTaskCommand invalidCommand : invalidCommands) {
+            assertTaskParsingFails(
+                    invalidCommand.command(), invalidCommand.commandType(), invalidCommand.message());
+        }
     }
 
     @Test
@@ -238,13 +267,17 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTask_deadlineWithImpossibleTime_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class, () ->
-                Parser.parseTask(
-                        "deadline submit report /by 2019-12-02 2460", CommandType.DEADLINE));
+    public void parseTask_deadlineWithInvalidDateTimes_exceptionThrown() {
+        String expectedMessage = "Please enter the date and optional time in yyyy-MM-dd [HHmm] "
+                + "format, for example 2019-12-02 1800.";
 
-        assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
-                + "for example 2019-12-02 1800.", exception.getMessage());
+        List<String> invalidCommands = List.of(
+                "deadline submit report /by 2019-12-02 2460",
+                "deadline submit report /by 2019-12-02 1800 extra");
+
+        for (String invalidCommand : invalidCommands) {
+            assertTaskParsingFails(invalidCommand, CommandType.DEADLINE, expectedMessage);
+        }
     }
 
     @Test
@@ -272,5 +305,17 @@ public class ParserTest {
                         CommandType.EVENT));
 
         assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
+
+    private static void assertTaskParsingFails(
+            String command, CommandType commandType, String expectedMessage) {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(command, commandType));
+
+        assertEquals(expectedMessage, exception.getMessage(), command);
+    }
+
+    private record InvalidTaskCommand(
+            String command, CommandType commandType, String message) {
     }
 }
