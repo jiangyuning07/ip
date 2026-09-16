@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.io.TempDir;
 import alex.storage.Storage;
 import alex.storage.StorageException;
 import alex.task.Deadline;
+import alex.task.Task;
+import alex.task.Todo;
 import alex.util.TaskDateTime;
 
 /**
@@ -65,5 +68,117 @@ public class AlexTest {
         CommandResult result = alex.getResponse("find report");
 
         assertEquals(new CommandResult("Sorry! No matches found.", true), result);
+    }
+
+    @Test
+    public void getResponse_blankCommand_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("   ");
+
+        assertEquals(new CommandResult("Sorry! Please enter a command.", true), result);
+    }
+
+    @Test
+    public void getResponse_listCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("list extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'list' command does not accept additional details.", true), result);
+    }
+
+    @Test
+    public void getResponse_upcomingCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("upcoming extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'upcoming' command does not accept additional details.", true), result);
+    }
+
+    @Test
+    public void getResponse_byeCommandWithDetails_returnsSpecificError() {
+        Alex alex = new Alex(tempDirectory.resolve("alex.txt").toString());
+
+        CommandResult result = alex.getResponse("bye extra details");
+
+        assertEquals(new CommandResult(
+                "Sorry! The 'bye' command does not accept additional details.", true), result);
+    }
+
+    @Test
+    public void getResponse_addWhenSaveFails_doesNotAddTask() {
+        Alex alex = createAlexWithSaveFailure(List.of());
+
+        CommandResult result = alex.getResponse("todo read book");
+
+        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult("Here are the tasks in your list:", false),
+                alex.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_markWhenSaveFails_doesNotMarkTask() {
+        Alex alex = createAlexWithSaveFailure(List.of(new Todo("read book")));
+
+        CommandResult result = alex.getResponse("mark 1");
+
+        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult(
+                "Here are the tasks in your list:\n 1.[T][ ] read book", false),
+                alex.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_unmarkWhenSaveFails_doesNotUnmarkTask() {
+        Task task = new Todo("read book");
+        task.markAsDone();
+        Alex alex = createAlexWithSaveFailure(List.of(task));
+
+        CommandResult result = alex.getResponse("unmark 1");
+
+        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult(
+                "Here are the tasks in your list:\n 1.[T][X] read book", false),
+                alex.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_deleteWhenSaveFails_doesNotDeleteTask() {
+        Alex alex = createAlexWithSaveFailure(List.of(new Todo("read book")));
+
+        CommandResult result = alex.getResponse("delete 1");
+
+        assertEquals(new CommandResult("Sorry! Simulated save failure.", true), result);
+        assertEquals(new CommandResult(
+                "Here are the tasks in your list:\n 1.[T][ ] read book", false),
+                alex.getResponse("list"));
+    }
+
+    private Alex createAlexWithSaveFailure(List<Task> initialTasks) {
+        return new Alex(new SaveFailingStorage(tempDirectory.resolve("alex.txt"), initialTasks),
+                Clock.systemDefaultZone());
+    }
+
+    private static class SaveFailingStorage extends Storage {
+        private final List<Task> initialTasks;
+
+        SaveFailingStorage(Path filePath, List<Task> initialTasks) {
+            super(filePath);
+            this.initialTasks = initialTasks;
+        }
+
+        @Override
+        public ArrayList<Task> loadTasks() {
+            return new ArrayList<>(initialTasks);
+        }
+
+        @Override
+        public void saveTasks(List<Task> tasks) throws StorageException {
+            throw new StorageException("Simulated save failure.");
+        }
     }
 }

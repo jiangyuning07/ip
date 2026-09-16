@@ -23,6 +23,11 @@ public class ParserTest {
     }
 
     @Test
+    public void parseCommandType_listCommandWithDetails_returnsList() {
+        assertEquals(CommandType.LIST, Parser.parseCommandType("list extra details"));
+    }
+
+    @Test
     public void parseTaskIndex_firstTask_returnsZero() throws AlexException {
         assertEquals(0, Parser.parseTaskIndex("delete 1", CommandType.DELETE, 3));
     }
@@ -99,12 +104,136 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTask_eventStartAfterEnd_returnsTimedEvent() throws AlexException {
+    public void parseTask_deadlineWithRepeatedDateDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "deadline report /by 2019-12-02 /by 2019-12-03",
+                        CommandType.DEADLINE));
+
+        assertEquals("A deadline must contain exactly one standalone /by delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_deadlineWithDelimiterLikeDescription_returnsDeadline()
+            throws AlexException {
         Task task = Parser.parseTask(
-                "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
+                "deadline review /bypass logic /by 2019-12-02", CommandType.DEADLINE);
+
+        assertEquals("D | 0 | review /bypass logic | 2019-12-02", task.toDataString());
+    }
+
+    @Test
+    public void parseTask_deadlineWithoutStandaloneDateDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "deadline review /bypass logic 2019-12-02", CommandType.DEADLINE));
+
+        assertEquals("A deadline must contain exactly one standalone /by delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventEndsBeforeStart_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventEndEqualsStart_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 1800 /to 2019-12-02 1800",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventDatesAreEqual_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 /to 2019-12-02",
+                        CommandType.EVENT));
+
+        assertEquals("The event end must be after its start.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventEndsAfterStart_returnsTimedEvent() throws AlexException {
+        Task task = Parser.parseTask(
+                "event meeting /from 2019-12-02 1700 /to 2019-12-02 1800",
                 CommandType.EVENT);
 
-        assertEquals("E | 0 | meeting | 2019-12-02 1800 | 2019-12-02 1700",
+        assertEquals("E | 0 | meeting | 2019-12-02 1700 | 2019-12-02 1800",
+                task.toDataString());
+    }
+
+    @Test
+    public void parseTask_eventWithRepeatedStartDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 /from 2019-12-03 /to 2019-12-04",
+                        CommandType.EVENT));
+
+        assertEquals("An event must contain exactly one standalone /from delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventWithoutStartDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /to 2019-12-03", CommandType.EVENT));
+
+        assertEquals("An event must contain exactly one standalone /from delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventWithRepeatedEndDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02 /to 2019-12-03 /to 2019-12-04",
+                        CommandType.EVENT));
+
+        assertEquals("An event must contain exactly one standalone /to delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventWithoutEndDelimiter_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /from 2019-12-02", CommandType.EVENT));
+
+        assertEquals("An event must contain exactly one standalone /to delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventWithMisorderedDelimiters_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event meeting /to 2019-12-03 /from 2019-12-02",
+                        CommandType.EVENT));
+
+        assertEquals("An event's /from delimiter must appear before its /to delimiter.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventWithDelimiterLikeDescription_returnsEvent()
+            throws AlexException {
+        Task task = Parser.parseTask(
+                "event discuss /fromage and /today /from 2019-12-02 /to 2019-12-03",
+                CommandType.EVENT);
+
+        assertEquals("E | 0 | discuss /fromage and /today | 2019-12-02 | 2019-12-03",
                 task.toDataString());
     }
 
@@ -116,5 +245,32 @@ public class ParserTest {
 
         assertEquals("Please enter the date and optional time in yyyy-MM-dd [HHmm] format, "
                 + "for example 2019-12-02 1800.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_todoDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask("todo compare A | B", CommandType.TODO));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_deadlineDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "deadline compare A | B /by 2019-12-02", CommandType.DEADLINE));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
+    }
+
+    @Test
+    public void parseTask_eventDescriptionContainsFieldSeparator_exceptionThrown() {
+        AlexException exception = assertThrows(AlexException.class, () ->
+                Parser.parseTask(
+                        "event compare A | B /from 2019-12-02 /to 2019-12-03",
+                        CommandType.EVENT));
+
+        assertEquals("Task descriptions cannot contain '|'.", exception.getMessage());
     }
 }

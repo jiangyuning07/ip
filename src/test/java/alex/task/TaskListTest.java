@@ -66,7 +66,8 @@ public class TaskListTest {
                 new Deadline("date only tomorrow", currentDateTime.toLocalDate().plusDays(1)),
                 completedDeadline,
                 new Todo("buy groceries"),
-                new Event("meeting", currentDateTime.toLocalDate(), currentDateTime.toLocalDate()));
+                new Event("meeting", currentDateTime.toLocalDate(),
+                        currentDateTime.toLocalDate().plusDays(1)));
 
         assertEquals(List.of(), tasks.findUpcomingDeadlines(currentDateTime));
     }

@@ -40,10 +40,21 @@ public class Alex {
      * @param clock clock used to determine the current time.
      */
     Alex(String filePath, Clock clock) {
+        this(new Storage(Path.of(filePath)), clock);
+    }
+
+    /**
+     * Creates Alex with injected storage and a clock for testing.
+     *
+     * @param storage storage used to load and save tasks.
+     * @param clock clock used to determine the current time.
+     */
+    Alex(Storage storage, Clock clock) {
+        assert storage != null : "Storage cannot be null";
         assert clock != null : "Clock cannot be null";
 
         ui = new Ui();
-        storage = new Storage(Path.of(filePath));
+        this.storage = storage;
         this.clock = clock;
 
         TaskList loadedTasks;
@@ -124,6 +135,13 @@ public class Alex {
         assert commandType == Parser.parseCommandType(command)
                 : "Command type must match the command text";
 
+        if (command.isBlank()) {
+            throw new AlexException("Please enter a command.");
+        }
+        if (commandType != CommandType.UNKNOWN && !commandType.canAcceptArguments()) {
+            Parser.validateNoArguments(command, commandType);
+        }
+
         return switch (commandType) {
             case BYE -> "Bye. Hope to see you again soon!";
             case LIST -> getTaskListResponse();
@@ -140,8 +158,14 @@ public class Alex {
     private String markTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.MARK, tasks.getSize());
         Task task = tasks.get(index);
+        boolean wasDone = task.isDone();
         task.markAsDone();
-        saveTasks();
+        try {
+            saveTasks();
+        } catch (StorageException e) {
+            setTaskCompletion(task, wasDone);
+            throw e;
+        }
 
         return "Nice! I've marked this task as done:\n"
                 + "   " + task;
@@ -150,8 +174,14 @@ public class Alex {
     private String unmarkTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.UNMARK, tasks.getSize());
         Task task = tasks.get(index);
+        boolean wasDone = task.isDone();
         task.markAsUndone();
-        saveTasks();
+        try {
+            saveTasks();
+        } catch (StorageException e) {
+            setTaskCompletion(task, wasDone);
+            throw e;
+        }
 
         return "OK, I've marked this task as not done yet:\n"
                 + "   " + task;
@@ -160,7 +190,12 @@ public class Alex {
     private String deleteTask(String command) throws AlexException, StorageException {
         int index = Parser.parseTaskIndex(command, CommandType.DELETE, tasks.getSize());
         Task removedTask = tasks.delete(index);
-        saveTasks();
+        try {
+            saveTasks();
+        } catch (StorageException e) {
+            tasks.add(index, removedTask);
+            throw e;
+        }
 
         return "Noted. I've removed this task:\n"
                 + "   " + removedTask + "\n"
@@ -212,7 +247,12 @@ public class Alex {
 
         Task task = Parser.parseTask(command, commandType);
         tasks.add(task);
-        saveTasks();
+        try {
+            saveTasks();
+        } catch (StorageException e) {
+            tasks.delete(tasks.getSize() - 1);
+            throw e;
+        }
 
         return "Got it. I've added this task:\n"
                 + "   " + task + "\n"
@@ -221,6 +261,14 @@ public class Alex {
 
     private void saveTasks() throws StorageException {
         storage.saveTasks(tasks.getTasks());
+    }
+
+    private static void setTaskCompletion(Task task, boolean isDone) {
+        if (isDone) {
+            task.markAsDone();
+        } else {
+            task.markAsUndone();
+        }
     }
 
     /**

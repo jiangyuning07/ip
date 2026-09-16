@@ -1,7 +1,11 @@
 package alex.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,5 +43,19 @@ public class StorageTest {
                 .toList();
 
         assertEquals(originalTasks.stream().map(Task::toDataString).toList(), loadedTaskData);
+    }
+
+    @Test
+    public void loadTasks_eventEndsBeforeStart_storageExceptionThrown() throws IOException {
+        Path dataFile = tempDirectory.resolve("alex.txt");
+        Files.writeString(dataFile,
+                "E | 0 | meeting | 2019-12-02 1800 | 2019-12-02 1700",
+                StandardCharsets.UTF_8);
+        Storage storage = new Storage(dataFile);
+
+        StorageException exception = assertThrows(StorageException.class, storage::loadTasks);
+
+        assertEquals("The data file is invalid at line 1: "
+                + "The event end must be after its start.", exception.getMessage());
     }
 }

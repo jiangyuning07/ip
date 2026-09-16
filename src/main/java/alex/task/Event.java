@@ -1,6 +1,8 @@
 package alex.task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import alex.util.DateParser;
 import alex.util.TaskDateTime;
@@ -35,8 +37,25 @@ public class Event extends Task {
         assert startDateTime != null : "Event start date and time cannot be null";
         assert endDateTime != null : "Event end date and time cannot be null";
 
+        LocalDateTime effectiveStartDateTime = getEffectiveDateTime(startDateTime);
+        LocalDateTime effectiveEndDateTime = getEffectiveDateTime(endDateTime);
+        if (!effectiveEndDateTime.isAfter(effectiveStartDateTime)) {
+            throw new IllegalArgumentException("The event end must be after its start.");
+        }
+
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+    }
+
+    /**
+     * Returns the date and time used to validate event ordering.
+     * A missing time is treated as the start of its date.
+     *
+     * @param dateTime event date and optional time.
+     * @return event date and effective time.
+     */
+    private static LocalDateTime getEffectiveDateTime(TaskDateTime dateTime) {
+        return LocalDateTime.of(dateTime.date(), dateTime.time().orElse(LocalTime.MIN));
     }
 
     /**
