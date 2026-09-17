@@ -66,6 +66,10 @@ public class MainWindow {
         }
 
         userInput.clear();
-        userInput.requestFocus();
+        if (result.shouldExit()) {
+            Platform.exit();
+        } else {
+            userInput.requestFocus();
+        }
     }
 }

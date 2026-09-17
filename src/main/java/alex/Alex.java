@@ -103,7 +103,7 @@ public class Alex {
      * Processes a user command and returns Alex's response.
      *
      * @param input user command.
-     * @return result containing Alex's response and whether it is an error.
+     * @return result containing Alex's response and command outcome.
      */
     public CommandResult getResponse(String input) {
         if (loadingErrorMessage != null) {
@@ -115,7 +115,10 @@ public class Alex {
         CommandType commandType = Parser.parseCommandType(command);
 
         try {
-            return CommandResult.success(executeCommand(command, commandType));
+            String response = executeCommand(command, commandType);
+            return commandType == CommandType.BYE
+                    ? CommandResult.exit(response)
+                    : CommandResult.success(response);
         } catch (AlexException | StorageException e) {
             return CommandResult.error(e.getMessage());
         }

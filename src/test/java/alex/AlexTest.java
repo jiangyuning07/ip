@@ -155,7 +155,8 @@ public class AlexTest {
                 "Found these tucked behind the espresso machine:\n 1.[T][ ] read book", false),
                 alex.getResponse("find book"));
         assertEquals(new CommandResult(
-                "All right, closing your tab. Try not to leave your tasks on the table.", false),
+                "All right, closing your tab. Try not to leave your tasks on the table.",
+                false, true),
                 alex.getResponse("bye"));
         assertEquals(new CommandResult(
                 "That's not on the menu. Try 'list', 'todo', 'deadline', or 'event'.", true),
