@@ -1,5 +1,5 @@
 .label {
-    -fx-background-color: #2563eb;
+    -fx-background-color: #8a5a3b;
     -fx-background-radius: 12px 12px 2px 12px;
     -fx-line-spacing: 2px;
     -fx-padding: 9px 12px;
@@ -8,9 +8,9 @@
 }
 
 .reply-label {
-    -fx-background-color: #e2e8f0;
+    -fx-background-color: #e1c9ad;
     -fx-background-radius: 12px 12px 12px 2px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #3f2c22;
 }
 
 .error-label {

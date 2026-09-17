@@ -1,5 +1,5 @@
 .app-root {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: #f3eadb;
     -fx-font-family: "System";
     -fx-font-size: 14px;
 }
@@ -20,12 +20,12 @@
 }
 
 .text-field:focused {
-    -fx-border-color: #2563eb;
-    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.16), 6, 0, 0, 1);
+    -fx-border-color: #8a5a3b;
+    -fx-effect: dropshadow(gaussian, rgba(138, 90, 59, 0.18), 6, 0, 0, 1);
 }
 
 .button {
-    -fx-background-color: #2563eb;
+    -fx-background-color: #8a5a3b;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
     -fx-text-fill: white;
@@ -33,11 +33,11 @@
 }
 
 .button:hover {
-    -fx-background-color: #1d4ed8;
+    -fx-background-color: #74472f;
 }
 
 .button:armed {
-    -fx-background-color: #1e40af;
+    -fx-background-color: #5f3725;
 }
 
 .scroll-bar:vertical {
