@@ -89,7 +89,7 @@ public class StorageTest {
         StorageException exception = assertThrows(StorageException.class, storage::loadTasks);
 
         assertEquals("The data file is invalid at line 1: "
-                + "The event ends before it starts. We serve coffee, not temporal paradoxes.",
+                + "The event must end after it starts. We serve coffee, not temporal paradoxes.",
                 exception.getMessage());
     }
 

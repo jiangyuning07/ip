@@ -109,22 +109,53 @@ public class ParserTest {
                         "todo", CommandType.TODO,
                         "One todo with no description? That's basically an empty cup."),
                 new InvalidTaskCommand(
+                        "deadline", CommandType.DEADLINE,
+                        "A deadline needs a description first. "
+                                + "Tell me what you're ordering before '/by'."),
+                new InvalidTaskCommand(
                         "deadline /by 2019-12-02", CommandType.DEADLINE,
                         "I have the due date, but not what you're ordering. "
                                 + "Add a description before '/by'."),
                 new InvalidTaskCommand(
+                        "deadline /by 2019-12-02 /by 2019-12-03", CommandType.DEADLINE,
+                        "I have the due date, but not what you're ordering. "
+                                + "Add a description before '/by'."),
+                new InvalidTaskCommand(
                         "deadline submit report /by", CommandType.DEADLINE,
-                        "You forgot the due date. Add one after '/by' so I know when to serve it."),
+                        "You forgot the due date. Add one after '/by' so I know when to serve it. "
+                                + "Use yyyy-MM-dd and optionally HHmm, like 2026-09-20 1830."),
+                new InvalidTaskCommand(
+                        "event", CommandType.EVENT,
+                        "An event needs a description first. "
+                                + "Tell me what you're booking before '/from'."),
+                new InvalidTaskCommand(
+                        "event /from", CommandType.EVENT,
+                        "I have the booking time, but no idea what it's for. "
+                                + "Add a description first."),
+                new InvalidTaskCommand(
+                        "event /to 2019-12-03", CommandType.EVENT,
+                        "I have the booking time, but no idea what it's for. "
+                                + "Add a description first."),
+                new InvalidTaskCommand(
+                        "event /to 2019-12-03 /from 2019-12-02", CommandType.EVENT,
+                        "I have the booking time, but no idea what it's for. "
+                                + "Add a description first."),
                 new InvalidTaskCommand(
                         "event /from 2019-12-02 /to 2019-12-03", CommandType.EVENT,
                         "I have the booking time, but no idea what it's for. "
                                 + "Add a description first."),
                 new InvalidTaskCommand(
+                        "event meeting /from", CommandType.EVENT,
+                        "When does this start? Add a date after '/from'. "
+                                + "Use yyyy-MM-dd and optionally HHmm, like 2026-09-20 1830."),
+                new InvalidTaskCommand(
                         "event meeting /from /to 2019-12-03", CommandType.EVENT,
-                        "When does this start? Add a date after '/from'."),
+                        "When does this start? Add a date after '/from'. "
+                                + "Use yyyy-MM-dd and optionally HHmm, like 2026-09-20 1830."),
                 new InvalidTaskCommand(
                         "event meeting /from 2019-12-02 /to", CommandType.EVENT,
-                        "When does this end? Add a date after '/to'."));
+                        "When does this end? Add a date after '/to'. "
+                                + "Use yyyy-MM-dd and optionally HHmm, like 2026-09-20 1830."));
 
         for (InvalidTaskCommand invalidCommand : invalidCommands) {
             assertTaskParsingFails(
@@ -177,7 +208,7 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 1800 /to 2019-12-02 1700",
                         CommandType.EVENT));
 
-        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+        assertEquals("The event must end after it starts. We serve coffee, not temporal paradoxes.",
                 exception.getMessage());
     }
 
@@ -188,7 +219,7 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 1800 /to 2019-12-02 1800",
                         CommandType.EVENT));
 
-        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+        assertEquals("The event must end after it starts. We serve coffee, not temporal paradoxes.",
                 exception.getMessage());
     }
 
@@ -199,7 +230,7 @@ public class ParserTest {
                         "event meeting /from 2019-12-02 /to 2019-12-02",
                         CommandType.EVENT));
 
-        assertEquals("The event ends before it starts. We serve coffee, not temporal paradoxes.",
+        assertEquals("The event must end after it starts. We serve coffee, not temporal paradoxes.",
                 exception.getMessage());
     }
 
@@ -292,6 +323,19 @@ public class ParserTest {
     }
 
     @Test
+    public void parseTask_eventWithInvalidStartDateTime_exceptionThrown() {
+        String expectedMessage = "I couldn't read that. Use yyyy-MM-dd and optionally HHmm, "
+                + "like 2026-09-20 1830.";
+        List<String> invalidCommands = List.of(
+                "event meeting /from tomorrow",
+                "event meeting /from tomorrow /to");
+
+        for (String invalidCommand : invalidCommands) {
+            assertTaskParsingFails(invalidCommand, CommandType.EVENT, expectedMessage);
+        }
+    }
+
+    @Test
     public void parseTask_todoDescriptionContainsFieldSeparator_exceptionThrown() {
         AlexException exception = assertThrows(AlexException.class, () ->
                 Parser.parseTask("todo compare A | B", CommandType.TODO));
@@ -312,13 +356,14 @@ public class ParserTest {
 
     @Test
     public void parseTask_eventDescriptionContainsFieldSeparator_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class, () ->
-                Parser.parseTask(
-                        "event compare A | B /from 2019-12-02 /to 2019-12-03",
-                        CommandType.EVENT));
+        List<String> invalidCommands = List.of(
+                "event compare A | B /from",
+                "event compare A | B /from 2019-12-02 /to 2019-12-03");
 
-        assertEquals("Task descriptions can't contain '|'. House rule, apparently.",
-                exception.getMessage());
+        for (String invalidCommand : invalidCommands) {
+            assertTaskParsingFails(invalidCommand, CommandType.EVENT,
+                    "Task descriptions can't contain '|'. House rule, apparently.");
+        }
     }
 
     private static void assertTaskParsingFails(

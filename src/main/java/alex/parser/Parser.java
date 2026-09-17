@@ -20,6 +20,8 @@ public class Parser {
     private static final String DEADLINE_DATE_MARKER = "/by";
     private static final String EVENT_START_DATE_MARKER = "/from";
     private static final String EVENT_END_DATE_MARKER = "/to";
+    private static final String DATE_TIME_FORMAT_GUIDANCE =
+            "Use yyyy-MM-dd and optionally HHmm, like 2026-09-20 1830.";
     private static final Pattern DEADLINE_DATE_MARKER_PATTERN = Pattern.compile(
             "(?<!\\S)" + Pattern.quote(DEADLINE_DATE_MARKER) + "(?!\\S)");
     private static final Pattern EVENT_START_DATE_MARKER_PATTERN = Pattern.compile(
@@ -156,9 +158,18 @@ public class Parser {
 
     private static Task parseDeadline(String command) throws AlexException {
         String details = getArguments(command, CommandType.DEADLINE);
+        if (details.isEmpty()) {
+            throw new AlexException("A deadline needs a description first. "
+                    + "Tell me what you're ordering before '/by'.");
+        }
+
         List<Integer> dueDateSeparators = findMarkerPositions(
                 details, DEADLINE_DATE_MARKER_PATTERN);
 
+        if (!dueDateSeparators.isEmpty() && dueDateSeparators.get(0) == 0) {
+            throw new AlexException("I have the due date, but not what you're ordering. "
+                    + "Add a description before '/by'.");
+        }
         if (dueDateSeparators.size() != 1) {
             throw new AlexException(
                     "A deadline needs one '" + DEADLINE_DATE_MARKER + "' before its due date. House rule.");
@@ -168,14 +179,11 @@ public class Parser {
         String description = details.substring(0, dueDateSeparator).trim();
         String dueDateText = details.substring(
                 dueDateSeparator + DEADLINE_DATE_MARKER.length()).trim();
-        if (description.isEmpty()) {
-            throw new AlexException("I have the due date, but not what you're ordering. "
-                    + "Add a description before '/by'.");
-        }
         validateDescriptionCharacters(description);
         if (dueDateText.isEmpty()) {
-            throw new AlexException(
-                    "You forgot the due date. Add one after '/by' so I know when to serve it.");
+            throw new AlexException("You forgot the due date. "
+                    + "Add one after '/by' so I know when to serve it. "
+                    + DATE_TIME_FORMAT_GUIDANCE);
         }
 
         TaskDateTime dueDateTime = DateParser.parseTaskDateTime(dueDateText);
@@ -184,45 +192,57 @@ public class Parser {
 
     private static Task parseEvent(String command) throws AlexException {
         String details = getArguments(command, CommandType.EVENT);
+        if (details.isEmpty()) {
+            throw new AlexException("An event needs a description first. "
+                    + "Tell me what you're booking before '/from'.");
+        }
+
         List<Integer> startDateSeparators = findMarkerPositions(
                 details, EVENT_START_DATE_MARKER_PATTERN);
         List<Integer> endDateSeparators = findMarkerPositions(
                 details, EVENT_END_DATE_MARKER_PATTERN);
 
+        if ((!startDateSeparators.isEmpty() && startDateSeparators.get(0) == 0)
+                || (!endDateSeparators.isEmpty() && endDateSeparators.get(0) == 0)) {
+            throw new AlexException("I have the booking time, but no idea what it's for. "
+                    + "Add a description first.");
+        }
         if (startDateSeparators.size() != 1) {
             throw new AlexException(
                     "An event needs exactly one '/from'. One starting time is usually enough.");
         }
-        if (endDateSeparators.size() != 1) {
-            throw new AlexException(
-                    "An event needs exactly one '/to'. Let's not keep the table indefinitely.");
-        }
-
         int startDateSeparator = startDateSeparators.get(0);
-        int endDateSeparator = endDateSeparators.get(0);
-        if (startDateSeparator >= endDateSeparator) {
+        String description = details.substring(0, startDateSeparator).trim();
+        validateDescriptionCharacters(description);
+
+        int startDateTextEnd = endDateSeparators.isEmpty()
+                ? details.length()
+                : endDateSeparators.get(0);
+        if (startDateSeparator >= startDateTextEnd) {
             throw new AlexException(
                     "Put '/from' before '/to'. Time still works that way here.");
         }
 
-        String description = details.substring(0, startDateSeparator).trim();
         String startDateText = details.substring(
-                startDateSeparator + EVENT_START_DATE_MARKER.length(), endDateSeparator).trim();
+                startDateSeparator + EVENT_START_DATE_MARKER.length(), startDateTextEnd).trim();
+        if (startDateText.isEmpty()) {
+            throw new AlexException("When does this start? Add a date after '/from'. "
+                    + DATE_TIME_FORMAT_GUIDANCE);
+        }
+        TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
+
+        if (endDateSeparators.size() != 1) {
+            throw new AlexException(
+                    "An event needs exactly one '/to'. Let's not keep the table indefinitely.");
+        }
+        int endDateSeparator = endDateSeparators.get(0);
         String endDateText = details.substring(
                 endDateSeparator + EVENT_END_DATE_MARKER.length()).trim();
-        if (description.isEmpty()) {
-            throw new AlexException("I have the booking time, but no idea what it's for. "
-                    + "Add a description first.");
-        }
-        validateDescriptionCharacters(description);
-        if (startDateText.isEmpty()) {
-            throw new AlexException("When does this start? Add a date after '/from'.");
-        }
         if (endDateText.isEmpty()) {
-            throw new AlexException("When does this end? Add a date after '/to'.");
+            throw new AlexException("When does this end? Add a date after '/to'. "
+                    + DATE_TIME_FORMAT_GUIDANCE);
         }
 
-        TaskDateTime startDateTime = DateParser.parseTaskDateTime(startDateText);
         TaskDateTime endDateTime = DateParser.parseTaskDateTime(endDateText);
         try {
             return new Event(description, startDateTime, endDateTime);

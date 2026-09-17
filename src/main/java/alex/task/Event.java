@@ -41,7 +41,7 @@ public class Event extends Task {
         LocalDateTime effectiveEndDateTime = getEffectiveDateTime(endDateTime);
         if (!effectiveEndDateTime.isAfter(effectiveStartDateTime)) {
             throw new IllegalArgumentException(
-                    "The event ends before it starts. We serve coffee, not temporal paradoxes.");
+                    "The event must end after it starts. We serve coffee, not temporal paradoxes.");
         }
 
         this.startDateTime = startDateTime;
