@@ -27,6 +27,7 @@ public class Event extends Task {
 
     /**
      * Creates an event with a description and date range containing optional times.
+     * A missing start time means the start of its date; a missing end time means the end of its date.
      *
      * @param description description of the event.
      * @param startDateTime event start date and optional time.
@@ -37,8 +38,10 @@ public class Event extends Task {
         assert startDateTime != null : "Event start date and time cannot be null";
         assert endDateTime != null : "Event end date and time cannot be null";
 
-        LocalDateTime effectiveStartDateTime = getEffectiveDateTime(startDateTime);
-        LocalDateTime effectiveEndDateTime = getEffectiveDateTime(endDateTime);
+        LocalDateTime effectiveStartDateTime = LocalDateTime.of(
+                startDateTime.date(), startDateTime.time().orElse(LocalTime.MIN));
+        LocalDateTime effectiveEndDateTime = LocalDateTime.of(
+                endDateTime.date(), endDateTime.time().orElse(LocalTime.MAX));
         if (!effectiveEndDateTime.isAfter(effectiveStartDateTime)) {
             throw new IllegalArgumentException(
                     "The event must end after it starts. We serve coffee, not temporal paradoxes.");
@@ -46,17 +49,6 @@ public class Event extends Task {
 
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-    }
-
-    /**
-     * Returns the date and time used to validate event ordering.
-     * A missing time is treated as the start of its date.
-     *
-     * @param dateTime event date and optional time.
-     * @return event date and effective time.
-     */
-    private static LocalDateTime getEffectiveDateTime(TaskDateTime dateTime) {
-        return LocalDateTime.of(dateTime.date(), dateTime.time().orElse(LocalTime.MIN));
     }
 
     /**

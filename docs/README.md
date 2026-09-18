@@ -45,13 +45,14 @@ Examples:
 
 ### Add an event: `event`
 
-Adds an event with a start and end. The end must be later than the start.
+Adds an event with a start and end. The end must be later than the start. Without a time, `/from` means the start of the day and `/to` means the end of the day, so a date-only event can start and end on the same date.
 
 Format: `event DESCRIPTION /from DATE [TIME] /to DATE [TIME]`
 
 Examples:
 
 - `event orientation /from 2026-09-20 /to 2026-09-21`
+- `event workshop /from 2026-09-20 /to 2026-09-20`
 - `event team meeting /from 2026-09-20 1400 /to 2026-09-20 1530`
 
 ### View all tasks: `list`

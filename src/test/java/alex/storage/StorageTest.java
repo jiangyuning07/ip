@@ -39,6 +39,7 @@ public class StorageTest {
                 new Deadline("date only", LocalDate.of(2019, 12, 2)),
                 new Deadline("timed", new TaskDateTime(
                         LocalDate.of(2019, 12, 2), LocalTime.of(18, 0))),
+                new Event("same-day event", LocalDate.of(2019, 12, 2), LocalDate.of(2019, 12, 2)),
                 new Event("mixed event",
                         new TaskDateTime(LocalDate.of(2019, 12, 2)),
                         new TaskDateTime(LocalDate.of(2019, 12, 3), LocalTime.of(9, 30))));

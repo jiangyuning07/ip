@@ -2,12 +2,14 @@ package alex.gui;
 
 import alex.Alex;
 import alex.CommandResult;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controls the main application window.
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
 public class MainWindow {
     private static final String WELCOME_MESSAGE =
             "Hey. Welcome to Alex's.\nWhat can I get started for you?";
+    private static final Duration EXIT_DELAY = Duration.seconds(2);
 
     private final Image alexImage = new Image(
             getClass().getResourceAsStream("/images/DaAlex.png"));
@@ -29,6 +32,7 @@ public class MainWindow {
     private TextField userInput;
 
     private Alex alex;
+    private boolean isExiting;
 
     @FXML
     private void initialize() {
@@ -50,6 +54,10 @@ public class MainWindow {
 
     @FXML
     private void handleUserInput() {
+        if (isExiting) {
+            return;
+        }
+
         String input = userInput.getText().trim();
 
         CommandResult result = alex.getResponse(input);
@@ -67,7 +75,11 @@ public class MainWindow {
 
         userInput.clear();
         if (result.shouldExit()) {
-            Platform.exit();
+            isExiting = true;
+            userInput.setDisable(true);
+            PauseTransition exitPause = new PauseTransition(EXIT_DELAY);
+            exitPause.setOnFinished(event -> Platform.exit());
+            exitPause.play();
         } else {
             userInput.requestFocus();
         }

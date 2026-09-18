@@ -224,14 +224,21 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTask_eventDatesAreEqual_exceptionThrown() {
-        AlexException exception = assertThrows(AlexException.class, () ->
-                Parser.parseTask(
-                        "event meeting /from 2019-12-02 /to 2019-12-02",
-                        CommandType.EVENT));
+    public void parseTask_eventDatesAreEqualWithoutTimes_returnsEvent() throws AlexException {
+        Task task = Parser.parseTask(
+                "event meeting /from 2019-12-02 /to 2019-12-02",
+                CommandType.EVENT);
 
-        assertEquals("The event must end after it starts. We serve coffee, not temporal paradoxes.",
-                exception.getMessage());
+        assertEquals("E | 0 | meeting | 2019-12-02 | 2019-12-02", task.toDataString());
+    }
+
+    @Test
+    public void parseTask_eventTimedStartAndDateOnlyEnd_returnsEvent() throws AlexException {
+        Task task = Parser.parseTask(
+                "event meeting /from 2019-12-02 1400 /to 2019-12-02",
+                CommandType.EVENT);
+
+        assertEquals("E | 0 | meeting | 2019-12-02 1400 | 2019-12-02", task.toDataString());
     }
 
     @Test
